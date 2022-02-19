@@ -20,5 +20,9 @@
   "bugs": {
     "url": "https://github.com/matejos/avax-arbitrage-bot/issues"
   },
-  "homepage": "https://github.com/matejos/avax-arbitrage-bot#readme"
+  "homepage": "https://github.com/matejos/avax-arbitrage-bot#readme",
+  "dependencies": {
+    "dotenv": "^16.0.0",
+    "ethers": "^5.5.4"
+  }
 }
