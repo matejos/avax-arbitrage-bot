@@ -1,38 +1,46 @@
 {
-  "name": "avax-arbitrage-bot",
-  "version": "1.0.0",
-  "description": "Avalanche Arbitrage Bot for bounty https://docs.google.com/document/d/13sfGbXdJl9gLHDQ-myG3XZgEQUHLQJIEon2qhE9fCvA/edit",
-  "main": "index.js",
-  "scripts": {
-    "compile": "npx hardhat compile",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "runbot": "npx hardhat run scripts/arbbot.ts --network fuji"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/matejos/avax-arbitrage-bot.git"
-  },
-  "keywords": [
-    "avax",
-    "arbitrage",
-    "bot"
-  ],
-  "author": "Matej Poklemba",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/matejos/avax-arbitrage-bot/issues"
-  },
-  "homepage": "https://github.com/matejos/avax-arbitrage-bot#readme",
-  "dependencies": {
-    "@nomiclabs/hardhat-ethers": "^2.0.2",
-    "@nomiclabs/hardhat-waffle": "^2.0.1",
-    "dotenv": "^16.0.0",
-    "ethers": "^5.5.4",
-    "hardhat": "2.6.1",
-    "ts-node": "^10.2.1",
-    "typescript": "^4.3.5"
-  },
-  "devDependencies": {
-    "@uniswap/v2-core": "^1.0.1"
-  }
+    "name": "avax-arbitrage-bot",
+    "version": "1.0.0",
+    "description": "Avalanche Arbitrage Bot for bounty https://docs.google.com/document/d/13sfGbXdJl9gLHDQ-myG3XZgEQUHLQJIEon2qhE9fCvA/edit",
+    "main": "index.js",
+    "scripts": {
+        "accounts": "npx hardhat accounts",
+        "balances": "npx hardhat balances",
+        "compile": "npx hardhat compile",
+        "console": "npx hardhat console",
+        "deploy": "npx hardhat run scripts/deploy.ts",
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "runbot": "npx hardhat run scripts/arbbot.ts --network fuji"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/matejos/avax-arbitrage-bot.git"
+    },
+    "keywords": [
+        "avax",
+        "arbitrage",
+        "bot"
+    ],
+    "author": "Matej Poklemba",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/matejos/avax-arbitrage-bot/issues"
+    },
+    "homepage": "https://github.com/matejos/avax-arbitrage-bot#readme",
+    "dependencies": {
+        "@nomiclabs/hardhat-ethers": "^2.0.2",
+        "@nomiclabs/hardhat-waffle": "^2.0.1",
+        "dotenv": "^16.0.0",
+        "ethers": "^5.5.4",
+        "hardhat": "2.6.1",
+        "ts-node": "^10.2.1",
+        "typescript": "^4.3.5"
+    },
+    "devDependencies": {
+        "@uniswap/v2-core": "^1.0.1",
+        "eslint": "^8.9.0",
+        "eslint-config-prettier": "^8.4.0",
+        "eslint-plugin-prettier": "^4.0.0",
+        "prettier": "^2.5.1"
+    }
 }
