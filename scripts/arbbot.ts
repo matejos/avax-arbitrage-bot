@@ -2,7 +2,6 @@ import 'dotenv/config'
 import { ethers } from 'hardhat'
 import UniswapV2Pair from '../abis/IUniswapV2Pair.json'
 import UniswapV2Factory from '../abis/IUniswapV2Factory.json'
-import PangolinFactory from '../abis/IPangolinFactory.json'
 import Addresses from './addresses'
 import { Contract } from 'ethers'
 
@@ -13,35 +12,41 @@ const ETH_TRADE = 10
 const DAI_TRADE = 3500
 
 const runBot = async () => {
-    const pangolinFactory = await ethers.getContractAt(PangolinFactory, Addresses.PANGOLIN_FACTORY)
-    // const uniswapFactory = new ethers.Contract(
-    //     '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f',
-    //     UniswapV2Factory.abi,
-    //     wallet
-    // )
-    const usdtAddress = '0xF71Fa18B5401f8e0AB26f9F80ac3cdDe68C6Cdd2'
+    const pangolinFactory = await ethers.getContractAt(
+        UniswapV2Factory.abi,
+        Addresses.PANGOLIN_FACTORY
+    )
+    const joeFactory = await ethers.getContractAt(UniswapV2Factory.abi, Addresses.JOE_FACTORY)
+
+    const usdtAddress = Addresses.USDT
     const wavaxAddress = Addresses.WAVAX
 
     let pangolinAvaxUsdt: Contract
-    // let uniswapAvaxUsdt
+    let joeAvaxUsdt: Contract
 
     const loadPairs = async () => {
         pangolinAvaxUsdt = await ethers.getContractAt(
             UniswapV2Pair.abi,
             await pangolinFactory.getPair(wavaxAddress, usdtAddress)
         )
-        // uniswapAvaxUsdt = new ethers.Contract(
-        //     await uniswapFactory.getPair(wavaxAddress, usdtAddress),
-        //     UniswapV2Pair.abi,
-        //     wallet
-        // )
+        joeAvaxUsdt = await ethers.getContractAt(
+            UniswapV2Pair.abi,
+            await joeFactory.getPair(wavaxAddress, usdtAddress)
+        )
     }
 
     await loadPairs()
-    console.log('pangolinAvaxUsdt', pangolinAvaxUsdt.address)
 
     const pangolinReserves = await pangolinAvaxUsdt.getReserves()
-    console.log('pango', pangolinReserves)
+    const joeReserves = await joeAvaxUsdt.getReserves()
+
+    const reserve0Pangolin = Number(ethers.utils.formatUnits(pangolinReserves[0], 18))
+    const reserve1Pangolin = Number(ethers.utils.formatUnits(pangolinReserves[1], 18))
+    const reserve0Joe = Number(ethers.utils.formatUnits(joeReserves[0], 18))
+    const reserve1Joe = Number(ethers.utils.formatUnits(joeReserves[1], 18))
+
+    console.log('pangolin reserves', { reserve0Pangolin, reserve1Pangolin })
+    console.log('joe reserves', { reserve0Joe, reserve1Joe })
 }
 
 console.log('Bot started!')
