@@ -47,6 +47,16 @@ const runBot = async () => {
 
     console.log('pangolin reserves', { reserve0Pangolin, reserve1Pangolin })
     console.log('joe reserves', { reserve0Joe, reserve1Joe })
+    // ethers.provider.estimateGas({})
+    // const gasLimit = await pangolinAvaxUsdt.estimateGas.swap(
+    //     '100000000000000000',
+    //     '0',
+    //     flashSwapperAddress,
+    //     ethers.utils.toUtf8Bytes('1')
+    // )
+    // console.log('gaslimit', gasLimit)
+    const gasPrice = await ethers.provider.getGasPrice()
+    console.log('gasprice', gasPrice)
 }
 
 console.log('Bot started!')

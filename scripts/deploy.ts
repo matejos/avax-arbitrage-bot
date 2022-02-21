@@ -6,7 +6,6 @@ const main = async (): Promise<any> => {
     const FlashSwap: ContractFactory = await ethers.getContractFactory('FlashSwap')
     const flashSwap: Contract = await FlashSwap.deploy(
         Addresses.PANGOLIN_FACTORY,
-        Addresses.PANGOLIN_FACTORY,
         Addresses.PANGOLIN_ROUTER
     )
 
