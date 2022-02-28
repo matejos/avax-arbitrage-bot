@@ -6,7 +6,7 @@ import Addresses from '../scripts/addresses'
 
 chai.use(solidity)
 
-const JOE_AVAX_USDT_ADDRESS = '0x764804cEbD8e67C9AcF073cd2CF8a98BD31d2cB9'
+const JOE_AVAX_USDT_ADDRESS = '0x94de0b724032755Ae3fda8037db57D769A967F21'
 
 describe('Simple swapping test', function () {
     before(async function () {
@@ -17,7 +17,7 @@ describe('Simple swapping test', function () {
                 {
                     forking: {
                         jsonRpcUrl: 'https://api.avax-test.network/ext/bc/C/rpc',
-                        blockNumber: 6348134,
+                        blockNumber: 6710950,
                     },
                     live: false,
                     saveDeployments: true,
@@ -54,8 +54,8 @@ describe('Simple swapping test', function () {
             }
             const balanceBefore = await this.wavax.balanceOf(this.owner.address)
             await this.joeAvaxUsdt.swap(
-                '1000000000000000',
                 '0',
+                '1000000000000000',
                 this.flashSwap.address,
                 ethers.utils.toUtf8Bytes('1')
             )
