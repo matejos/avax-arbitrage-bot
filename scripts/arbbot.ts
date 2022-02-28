@@ -8,9 +8,6 @@ import { Contract } from 'ethers'
 const privateKey = process.env.MNEMONIC
 const flashSwapperAddress = process.env.FLASH_SWAPPER
 
-const ETH_TRADE = 10
-const DAI_TRADE = 3500
-
 const runBot = async () => {
     const pangolinFactory = await ethers.getContractAt(
         UniswapV2Factory.abi,
@@ -45,6 +42,7 @@ const runBot = async () => {
     const reserve0Joe = Number(ethers.utils.formatUnits(joeReserves[0], 18))
     const reserve1Joe = Number(ethers.utils.formatUnits(joeReserves[1], 18))
 
+    // eslint-disable-next-line no-console
     console.log('pangolin reserves', { reserve0Pangolin, reserve1Pangolin })
     console.log('joe reserves', { reserve0Joe, reserve1Joe })
     // ethers.provider.estimateGas({})
