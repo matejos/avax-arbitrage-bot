@@ -3,18 +3,15 @@ pragma solidity >= 0.6.6;
 
 import "hardhat/console.sol";
 import './libraries/PangolinLibrary.sol';
-import './libraries/JoeLibrary.sol';
-import './interfaces/V1/IUniswapV1Factory.sol';
-import './interfaces/V1/IUniswapV1Exchange.sol';
 import './interfaces/IPangolinRouter.sol';
 import './interfaces/IPangolinCallee.sol';
-import './interfaces/IJoeCallee.sol';
+import './interfaces/IPangolinPair.sol';
 import './interfaces/IERC20.sol';
 import './interfaces/IWAVAX.sol';
 
 import "./libraries/SafeMath.sol";
 
-contract FlashSwap is IJoeCallee {
+contract FlashSwapPangolin is IPangolinCallee {
     using SafeMath for uint;
 
     IPangolinRouter immutable router;
@@ -31,13 +28,13 @@ contract FlashSwap is IJoeCallee {
     receive() external payable {}
 
     // gets tokensA via V2 flash swap, swaps for tokensB on other router, repays, and keeps the rest!
-    function joeCall(address sender, uint amount0, uint amount1, bytes calldata data) external override {
+    function pangolinCall(address sender, uint amount0, uint amount1, bytes calldata data) external override {
         address[] memory path = new address[](2);
         uint amountToken;
         { // scope for token{0,1}, avoids stack too deep errors
         address token0 = IPangolinPair(msg.sender).token0();
         address token1 = IPangolinPair(msg.sender).token1();
-        assert(msg.sender == JoeLibrary.pairFor(factory, token0, token1)); // ensure that msg.sender is actually a V2 pair
+        assert(msg.sender == PangolinLibrary.pairFor(factory, token0, token1)); // ensure that msg.sender is actually a V2 pair
         assert(amount0 == 0 || amount1 == 0); // this strategy is unidirectional
         path[0] = amount0 == 0 ? token1 : token0;
         path[1] = amount0 == 0 ? token0 : token1;
@@ -50,7 +47,7 @@ contract FlashSwap is IJoeCallee {
         address[] memory pathReverse = new address[](2);
         pathReverse[0] = path[1];
         pathReverse[1] = path[0];
-        uint amountRequired = JoeLibrary.getAmountsIn(factory, amountToken, pathReverse)[0];
+        uint amountRequired = PangolinLibrary.getAmountsIn(factory, amountToken, pathReverse)[0];
         uint amountReceived = router.swapTokensForExactTokens(amountRequired, amountToken, path, msg.sender, block.timestamp + deadline)[0];
 
         assert(token.transfer(sender, amountToken - amountReceived)); // send me the profits!
