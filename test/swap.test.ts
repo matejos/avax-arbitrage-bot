@@ -3,7 +3,7 @@ import chai, { expect } from 'chai'
 import { solidity } from 'ethereum-waffle'
 import UniswapV2Pair from '../abis/IUniswapV2Pair.json'
 import Addresses from '../scripts/addresses'
-import { expandTo18Decimals, expandToXDecimals } from '../scripts/utility'
+import { findMaxProfit, ReservesType } from '../scripts/utility'
 
 chai.use(solidity)
 
@@ -57,10 +57,24 @@ describe('Simple swapping test', function () {
 
     describe('Proof of Concept', function () {
         it('swap avax->usdt', async function () {
+            const joeReserves = await this.joeUsdtAvax.getReserves()
+            const pangoReserves = await this.pangoUsdtAvax.getReserves()
+            const reserves: ReservesType = {
+                primaryA: joeReserves[1], // joe avax reserve
+                primaryB: joeReserves[0], // joe usdt reserve
+                secondaryA: pangoReserves[1], // pangolin avax reserve
+                secondaryB: pangoReserves[0], // pangolin usdt reserve
+            }
+
             const balanceBefore = await this.wavax.balanceOf(this.owner.address)
+            const maxProfitCalc = findMaxProfit(reserves)
+            console.log(
+                'projected profit (excluding gas costs)',
+                ethers.utils.formatEther(maxProfitCalc.profit.toString())
+            )
             await this.joeUsdtAvax.swap(
                 '0',
-                expandToXDecimals(10850, 13),
+                maxProfitCalc.tokenAmount,
                 this.flashSwapJoe.address,
                 ethers.utils.toUtf8Bytes('1')
             )
@@ -70,9 +84,23 @@ describe('Simple swapping test', function () {
         })
 
         it('swap usdt->avax', async function () {
+            const joeReserves = await this.joeUsdtAvax.getReserves()
+            const pangoReserves = await this.pangoUsdtAvax.getReserves()
+            const reserves: ReservesType = {
+                primaryA: pangoReserves[0], // pangolin usdt reserve
+                primaryB: pangoReserves[1], // pangolin avax reserve
+                secondaryA: joeReserves[0], // joe usdt reserve
+                secondaryB: joeReserves[1], // joe avax reserve
+            }
+
             const balanceBefore = await this.usdt.balanceOf(this.owner.address)
+            const maxProfitCalc = findMaxProfit(reserves)
+            console.log(
+                'projected profit (excluding gas costs)',
+                ethers.utils.formatEther(maxProfitCalc.profit.toString())
+            )
             await this.pangoUsdtAvax.swap(
-                expandToXDecimals(5423, 18),
+                maxProfitCalc.tokenAmount,
                 '0',
                 this.flashSwapPangolin.address,
                 ethers.utils.toUtf8Bytes('1')
