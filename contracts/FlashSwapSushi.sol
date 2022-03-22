@@ -2,11 +2,13 @@
 pragma solidity >= 0.6.12;
 
 import "hardhat/console.sol";
-import './interfaces/IERC20.sol';
+import '@sushiswap/core/contracts/interfaces/IERC20.sol';
 import '@sushiswap/core/contracts/uniswapv2/interfaces/IUniswapV2Callee.sol';
 import "@sushiswap/core/contracts/uniswapv2/interfaces/IUniswapV2Pair.sol";
 import '@sushiswap/core/contracts/uniswapv2/libraries/UniswapV2Library.sol';
-import './interfaces/IPangolinRouter.sol';
+import '@sushiswap/core/contracts/uniswapv2/libraries/TransferHelper.sol';
+
+import '@pangolindex/exchange-contracts/contracts/pangolin-periphery/interfaces/IPangolinRouter.sol';
 
 contract FlashSwapSushi is IUniswapV2Callee {
     IPangolinRouter immutable router;
@@ -45,6 +47,6 @@ contract FlashSwapSushi is IUniswapV2Callee {
         uint amountRequired = UniswapV2Library.getAmountsIn(factory, amountToken, pathReverse)[0];
         uint amountReceived = router.swapTokensForExactTokens(amountRequired, amountToken, path, msg.sender, block.timestamp + deadline)[0];
 
-        assert(token.transfer(sender, amountToken - amountReceived)); // send me the profits!
+        TransferHelper.safeTransfer(address(token), sender, amountToken - amountReceived); // send me the profits!
     }
 }

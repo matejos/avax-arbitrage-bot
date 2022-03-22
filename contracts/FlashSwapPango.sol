@@ -1,19 +1,16 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >= 0.6.6;
+pragma solidity >= 0.6.12;
 
 import "hardhat/console.sol";
-import './libraries/PangolinLibrary.sol';
-import './interfaces/IPangolinRouter.sol';
-import './interfaces/IPangolinCallee.sol';
-import './interfaces/IPangolinPair.sol';
-import './interfaces/IERC20.sol';
-import './interfaces/IWAVAX.sol';
+import "@pangolindex/exchange-contracts/contracts/pangolin-periphery/libraries/PangolinLibrary.sol";
+import "@pangolindex/exchange-contracts/contracts/pangolin-core/interfaces/IPangolinCallee.sol";
+import "@pangolindex/exchange-contracts/contracts/pangolin-core/interfaces/IPangolinPair.sol";
+import "@pangolindex/exchange-contracts/contracts/pangolin-core/interfaces/IERC20.sol";
+import "@pangolindex/exchange-contracts/contracts/pangolin-lib/libraries/TransferHelper.sol";
 
-import "./libraries/SafeMath.sol";
+import '@pangolindex/exchange-contracts/contracts/pangolin-periphery/interfaces/IPangolinRouter.sol';
 
 contract FlashSwapPangolin is IPangolinCallee {
-    using SafeMath for uint;
-
     IPangolinRouter immutable router;
     address immutable factory;
     uint constant deadline = 1 days;
@@ -50,6 +47,6 @@ contract FlashSwapPangolin is IPangolinCallee {
         uint amountRequired = PangolinLibrary.getAmountsIn(factory, amountToken, pathReverse)[0];
         uint amountReceived = router.swapTokensForExactTokens(amountRequired, amountToken, path, msg.sender, block.timestamp + deadline)[0];
 
-        assert(token.transfer(sender, amountToken - amountReceived)); // send me the profits!
+        TransferHelper.safeTransfer(address(token), sender, amountToken - amountReceived); // send me the profits!
     }
 }

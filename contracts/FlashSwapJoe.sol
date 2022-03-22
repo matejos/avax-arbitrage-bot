@@ -2,12 +2,13 @@
 pragma solidity >= 0.6.12;
 
 import "hardhat/console.sol";
-import './interfaces/IPangolinRouter.sol';
 import "@traderjoe-xyz/core/contracts/traderjoe/interfaces/IJoeCallee.sol";
 import "@traderjoe-xyz/core/contracts/traderjoe/libraries/JoeLibrary.sol";
 import "@traderjoe-xyz/core/contracts/traderjoe/interfaces/IJoePair.sol";
-import './interfaces/IERC20.sol';
-import './interfaces/IWAVAX.sol';
+import "@traderjoe-xyz/core/contracts/interfaces/IERC20.sol";
+import "@traderjoe-xyz/core/contracts/traderjoe/libraries/TransferHelper.sol";
+
+import '@pangolindex/exchange-contracts/contracts/pangolin-periphery/interfaces/IPangolinRouter.sol';
 
 contract FlashSwapJoe is IJoeCallee {
     IPangolinRouter immutable router;
@@ -46,6 +47,6 @@ contract FlashSwapJoe is IJoeCallee {
         uint amountRequired = JoeLibrary.getAmountsIn(factory, amountToken, pathReverse)[0];
         uint amountReceived = router.swapTokensForExactTokens(amountRequired, amountToken, path, msg.sender, block.timestamp + deadline)[0];
 
-        assert(token.transfer(sender, amountToken - amountReceived)); // send me the profits!
+        TransferHelper.safeTransfer(address(token), sender, amountToken - amountReceived); // send me the profits!
     }
 }

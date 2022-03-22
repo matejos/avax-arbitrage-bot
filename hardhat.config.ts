@@ -16,8 +16,8 @@ const accounts = {
 // For more information go to the hardhat guide
 // https://hardhat.org/hardhat-network/
 // https://hardhat.org/guides/mainnet-forking.html
-const FORK_FUJI = true
-const FORK_MAINNET = false
+const FORK_FUJI = false
+const FORK_MAINNET = true
 const forkingData = FORK_FUJI
     ? {
           url: 'https://api.avax-test.network/ext/bc/C/rpc',
@@ -25,6 +25,7 @@ const forkingData = FORK_FUJI
     : FORK_MAINNET
     ? {
           url: 'https://api.avax.network/ext/bc/C/rpc',
+          blockNumber: 5249692, // 10 usdt to wavax sushi to pangolin (project profit 1135402592789238 wavax)
       }
     : undefined
 
@@ -74,8 +75,8 @@ const config: HardhatUserConfig = {
     },
     networks: {
         hardhat: {
-            gasPrice: 225000000000,
-            chainId: !forkingData ? 43112 : 43112, //Only specify a chainId if we are not forking
+            gasPrice: 25000000000, //225000000000,
+            chainId: !forkingData ? 43112 : 43114,
             forking: forkingData,
         },
         local: {
@@ -105,7 +106,7 @@ const config: HardhatUserConfig = {
             url: 'https://api.avax.network/ext/bc/C/rpc',
             gasPrice: 225000000000,
             chainId: 43114,
-            accounts: [],
+            accounts,
         },
     },
     namedAccounts: {
@@ -143,6 +144,18 @@ const config: HardhatUserConfig = {
             hardhat: '0x60aE616a2155Ee3d9A68541Ba4544862310933d4',
             fuji: '0x5db0735cf88F85E78ed742215090c465979B5006',
             mainnet: '0x60aE616a2155Ee3d9A68541Ba4544862310933d4',
+        },
+        sushiFactory: {
+            default: '0x99653EfFF54a26bc24567A251F74d8A0A9905390',
+            hardhat: '0xc35DADB65012eC5796536bD9864eD8773aBc74C4',
+            fuji: '0x99653EfFF54a26bc24567A251F74d8A0A9905390',
+            mainnet: '0xc35DADB65012eC5796536bD9864eD8773aBc74C4',
+        },
+        sushiRouter: {
+            default: '0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506',
+            hardhat: '0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506',
+            fuji: '0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506',
+            mainnet: '0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506',
         },
         wavax: {
             default: '0xd00ae08403B9bbb9124bB305C09058E32C39A48c',

@@ -10,7 +10,7 @@
         "console": "npx hardhat console",
         "deploy": "npx hardhat run scripts/deploy.ts",
         "test": "npx hardhat test",
-        "runbot": "npx hardhat run scripts/arbbot.ts --network fuji"
+        "runbot": "npx hardhat run scripts/arbbot.ts"
     },
     "repository": {
         "type": "git",
