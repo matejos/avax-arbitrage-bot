@@ -1,8 +1,10 @@
+import 'hardhat-deploy'
 import { task } from 'hardhat/config'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { BigNumber } from 'ethers'
 import '@nomiclabs/hardhat-waffle'
 import 'dotenv/config'
+import { HardhatUserConfig } from 'hardhat/types'
 
 const accounts = {
     mnemonic: process.env.MNEMONIC || 'test test test test test test test test test test test junk',
@@ -14,7 +16,7 @@ const accounts = {
 // For more information go to the hardhat guide
 // https://hardhat.org/hardhat-network/
 // https://hardhat.org/guides/mainnet-forking.html
-const FORK_FUJI = false
+const FORK_FUJI = true
 const FORK_MAINNET = false
 const forkingData = FORK_FUJI
     ? {
@@ -41,14 +43,7 @@ task('balances', 'Prints the list of AVAX account balances', async (args, hre): 
     }
 })
 
-export default {
-    abiExporter: {
-        path: './abis',
-        clear: false,
-        flat: true,
-        // only: [],
-        // except: []
-    },
+const config: HardhatUserConfig = {
     solidity: {
         compilers: [
             {
@@ -67,6 +62,9 @@ export default {
                 version: '0.6.6',
             },
             {
+                version: '0.6.12',
+            },
+            {
                 version: '0.7.0',
             },
             {
@@ -77,7 +75,7 @@ export default {
     networks: {
         hardhat: {
             gasPrice: 225000000000,
-            chainId: !forkingData ? 43112 : undefined, //Only specify a chainId if we are not forking
+            chainId: !forkingData ? 43112 : 43112, //Only specify a chainId if we are not forking
             forking: forkingData,
         },
         local: {
@@ -110,4 +108,79 @@ export default {
             accounts: [],
         },
     },
+    namedAccounts: {
+        deployer: {
+            default: 0, // here this will by default take the first account as deployer
+            hardhat: 0, // similarly on hardhat it will take the first account as deployer. Note though that depending on how hardhat network are configured, the account 0 on one network can be different than on another
+            fuji: 0,
+            mainnet: 0,
+        },
+        user: {
+            // Used for testing
+            default: 1,
+            hardhat: 1,
+        },
+        pangolinFactory: {
+            default: '0xE4A575550C2b460d2307b82dCd7aFe84AD1484dd',
+            hardhat: '0xefa94DE7a4656D787667C749f7E1223D71E9FD88',
+            fuji: '0xE4A575550C2b460d2307b82dCd7aFe84AD1484dd',
+            mainnet: '0xefa94DE7a4656D787667C749f7E1223D71E9FD88',
+        },
+        pangolinRouter: {
+            default: '0x2D99ABD9008Dc933ff5c0CD271B88309593aB921',
+            hardhat: '0xE54Ca86531e17Ef3616d22Ca28b0D458b6C89106',
+            fuji: '0x2D99ABD9008Dc933ff5c0CD271B88309593aB921',
+            mainnet: '0xE54Ca86531e17Ef3616d22Ca28b0D458b6C89106',
+        },
+        joeFactory: {
+            default: '0x7eeccb3028870540EEc3D88C2259506f2d34fEE0',
+            hardhat: '0x9Ad6C38BE94206cA50bb0d90783181662f0Cfa10',
+            fuji: '0x7eeccb3028870540EEc3D88C2259506f2d34fEE0',
+            mainnet: '0x9Ad6C38BE94206cA50bb0d90783181662f0Cfa10',
+        },
+        joeRouter: {
+            default: '0x5db0735cf88F85E78ed742215090c465979B5006',
+            hardhat: '0x60aE616a2155Ee3d9A68541Ba4544862310933d4',
+            fuji: '0x5db0735cf88F85E78ed742215090c465979B5006',
+            mainnet: '0x60aE616a2155Ee3d9A68541Ba4544862310933d4',
+        },
+        wavax: {
+            default: '0xd00ae08403B9bbb9124bB305C09058E32C39A48c',
+            hardhat: '0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7',
+            fuji: '0xd00ae08403B9bbb9124bB305C09058E32C39A48c',
+            mainnet: '0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7',
+        },
+        mycoin: {
+            default: '0xc6d1E00F83A37Dd6aE95755D0794FFbD077bf606',
+            fuji: '0xc6d1E00F83A37Dd6aE95755D0794FFbD077bf606',
+        },
+        usdt: {
+            default: '0x320f9A00BDDFE466887A8D0390cF32e9373fFc9f',
+            hardhat: '0xc7198437980c041c805A1EDcbA50c1Ce5db95118',
+            fuji: '0x320f9A00BDDFE466887A8D0390cF32e9373fFc9f',
+            mainnet: '0xc7198437980c041c805A1EDcbA50c1Ce5db95118',
+        },
+    },
+    // external: {
+    //     contracts: [
+    //         {
+    //             artifacts: 'node_modules/@openzeppelin/contracts-upgradeable/build/contracts',
+    //         },
+    //         {
+    //             artifacts: 'node_modules/@pangolindex/exchange-contracts/artifacts',
+    //         },
+    //         {
+    //             artifacts: 'node_modules/@traderjoe-xyz/core/artifacts',
+    //         },
+    //     ],
+    //     deployments: {
+    //         //   example: ["node_modules/@cartesi/arbitration/build/contracts"],
+    //         //   default: ["node_modules/@uniswap/v2-periphery/build"],
+    //         //   hardhat: ['node_modules/@uniswap/v2-periphery/build', 'node_modules/@uniswap/v2-core/build'],
+    //         //   fuji: ['node_modules/@uniswap/v2-periphery/build'],
+    //         //   mainnet: ['node_modules/@uniswap/v2-periphery/builds']
+    //     },
+    // },
 }
+
+export default config

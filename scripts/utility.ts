@@ -7,6 +7,15 @@ export type ReservesType = {
     secondaryB: BigNumber
 }
 
+export function isLocalEnv(envName: string) {
+    return !!(
+        {
+            hardhat: true,
+            localhost: true,
+        } as Record<string, true>
+    )[envName]
+}
+
 export function expandTo18Decimals(n: number): BigNumber {
     return BigNumber.from(n).mul(BigNumber.from(10).pow(18))
 }

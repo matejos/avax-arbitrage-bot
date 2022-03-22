@@ -2,14 +2,13 @@
 pragma solidity >= 0.6.12;
 
 import "hardhat/console.sol";
-import './interfaces/IPangolinRouter.sol';
-import "@traderjoe-xyz/core/contracts/traderjoe/interfaces/IJoeCallee.sol";
-import "@traderjoe-xyz/core/contracts/traderjoe/libraries/JoeLibrary.sol";
-import "@traderjoe-xyz/core/contracts/traderjoe/interfaces/IJoePair.sol";
 import './interfaces/IERC20.sol';
-import './interfaces/IWAVAX.sol';
+import '@sushiswap/core/contracts/uniswapv2/interfaces/IUniswapV2Callee.sol';
+import "@sushiswap/core/contracts/uniswapv2/interfaces/IUniswapV2Pair.sol";
+import '@sushiswap/core/contracts/uniswapv2/libraries/UniswapV2Library.sol';
+import './interfaces/IPangolinRouter.sol';
 
-contract FlashSwapJoe is IJoeCallee {
+contract FlashSwapSushi is IUniswapV2Callee {
     IPangolinRouter immutable router;
     address immutable factory;
     uint constant deadline = 1 days;
@@ -24,13 +23,13 @@ contract FlashSwapJoe is IJoeCallee {
     receive() external payable {}
 
     // gets tokensA via V2 flash swap, swaps for tokensB on other router, repays, and keeps the rest!
-    function joeCall(address sender, uint amount0, uint amount1, bytes calldata data) external override {
+    function uniswapV2Call(address sender, uint amount0, uint amount1, bytes calldata data) external override {
         address[] memory path = new address[](2);
         uint amountToken;
         { // scope for token{0,1}, avoids stack too deep errors
-        address token0 = IJoePair(msg.sender).token0();
-        address token1 = IJoePair(msg.sender).token1();
-        assert(msg.sender == JoeLibrary.pairFor(factory, token0, token1)); // ensure that msg.sender is actually a V2 pair
+        address token0 = IUniswapV2Pair(msg.sender).token0();
+        address token1 = IUniswapV2Pair(msg.sender).token1();
+        assert(msg.sender == UniswapV2Library.pairFor(factory, token0, token1)); // ensure that msg.sender is actually a V2 pair
         assert(amount0 == 0 || amount1 == 0); // this strategy is unidirectional
         path[0] = amount0 == 0 ? token1 : token0;
         path[1] = amount0 == 0 ? token0 : token1;
@@ -43,7 +42,7 @@ contract FlashSwapJoe is IJoeCallee {
         address[] memory pathReverse = new address[](2);
         pathReverse[0] = path[1];
         pathReverse[1] = path[0];
-        uint amountRequired = JoeLibrary.getAmountsIn(factory, amountToken, pathReverse)[0];
+        uint amountRequired = UniswapV2Library.getAmountsIn(factory, amountToken, pathReverse)[0];
         uint amountReceived = router.swapTokensForExactTokens(amountRequired, amountToken, path, msg.sender, block.timestamp + deadline)[0];
 
         assert(token.transfer(sender, amountToken - amountReceived)); // send me the profits!
