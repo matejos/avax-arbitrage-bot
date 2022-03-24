@@ -10,7 +10,8 @@
         "console": "npx hardhat console",
         "deploy": "npx hardhat run scripts/deploy.ts",
         "test": "npx hardhat test",
-        "runbot": "npx hardhat run scripts/arbbot.ts"
+        "runbot": "npx hardhat run scripts/arbbot.ts",
+        "arb:wavax-joe:pangolin-joe": "npx hardhat run scripts/arb/wavax-joe/WavaxJoeArbPangolinJoe.ts"
     },
     "repository": {
         "type": "git",

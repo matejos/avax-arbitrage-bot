@@ -2,99 +2,112 @@ import { getNamedAccounts, network, artifacts, ethers } from 'hardhat'
 import { isLocalEnv } from './utility'
 import IUniswapV2FactoryAbi from '@sushiswap/core/build/abi/IUniswapV2Factory.json'
 import IPangolinFactoryArtifact from '@pangolindex/exchange-contracts/artifacts/contracts/pangolin-core/interfaces/IPangolinFactory.sol/IPangolinFactory.json'
+import { Contract } from 'ethers'
+import { SetupResult } from './types'
+
+export enum DEX {
+    PANGOLIN,
+    SUSHISWAP,
+    TRADERJOE,
+}
+
+const FlashSwapContractNames: { [key in DEX]: string } = {
+    [DEX.PANGOLIN]: 'FlashSwapPangolin',
+    [DEX.SUSHISWAP]: 'FlashSwapSushi',
+    [DEX.TRADERJOE]: 'FlashSwapJoe',
+}
+
+const FactoryNamedAccounts: { [key in DEX]: string } = {
+    [DEX.PANGOLIN]: 'pangolinFactory',
+    [DEX.SUSHISWAP]: 'sushiFactory',
+    [DEX.TRADERJOE]: 'joeFactory',
+}
+
+const RouterNamedAccounts: { [key in DEX]: string } = {
+    [DEX.PANGOLIN]: 'pangolinRouter',
+    [DEX.SUSHISWAP]: 'sushiRouter',
+    [DEX.TRADERJOE]: 'joeRouter',
+}
+
+// const RouterNamedAccounts: { [key in DEX]: string } = {
+//     [DEX.PANGOLIN]: 'pangolinRouter',
+//     [DEX.SUSHISWAP]: 'sushiRouter',
+//     [DEX.TRADERJOE]: 'joeRouter',
+// }
+
+// const RouterNamedAccounts: { [key in DEX]: string } = {
+//     [DEX.PANGOLIN]: 'pangolinRouter',
+//     [DEX.SUSHISWAP]: 'sushiRouter',
+//     [DEX.TRADERJOE]: 'joeRouter',
+// }
 
 const setupPangolinSushi = async (
     firstTokenAddress: string,
-    secondTokenAddress: string
-    // swapFrom: ContractOptions
-): Promise<any> => {
-    const {
-        sushiFactory,
-        sushiRouter,
-        pangolinFactory,
-        pangolinRouter,
-        // flashSwapSushiPangoAddr,
-        // flashSwapPangolinSushiAddr,
-    } = await getNamedAccounts()
+    secondTokenAddress: string,
+    firstDex: DEX,
+    secondDex: DEX
+): Promise<SetupResult> => {
+    const namedAccounts = await getNamedAccounts()
     const signers = await ethers.getSigners()
-    let flashSwapSushi, flashSwapPango
+    let flashSwapFirst, flashSwapSecond
 
     if (isLocalEnv(network.name)) {
-        // if (swapFrom === ContractOptions.SUSHI_SWAP) {
-        const FlashSwapSushiPango = await ethers.getContractFactory('FlashSwapSushi')
-        const flashSwapSushiPangoDeployed = await FlashSwapSushiPango.deploy(
-            sushiFactory,
-            pangolinRouter
+        const FlashSwapFirst = await ethers.getContractFactory(FlashSwapContractNames[firstDex])
+        const flashSwapFirstDeployed = await FlashSwapFirst.deploy(
+            namedAccounts[FactoryNamedAccounts[firstDex]],
+            namedAccounts[RouterNamedAccounts[secondDex]]
         )
-        flashSwapSushi = new ethers.Contract(
-            flashSwapSushiPangoDeployed.address,
-            flashSwapSushiPangoDeployed.interface,
-            flashSwapSushiPangoDeployed.signer
+        console.log('flashSwapFirstDeployed.address', flashSwapFirstDeployed.address)
+        flashSwapFirst = flashSwapFirstDeployed.address
+        const FlashSwapSecond = await ethers.getContractFactory(FlashSwapContractNames[secondDex])
+        const flashSwapSecondDeployed = await FlashSwapSecond.deploy(
+            namedAccounts[FactoryNamedAccounts[secondDex]],
+            namedAccounts[RouterNamedAccounts[firstDex]]
         )
-        // } else if (swapFrom === ContractOptions.PANGOLIN) {
-        const FlashSwapPangoSushi = await ethers.getContractFactory('FlashSwapPangolin')
-        const flashSwapPangoSushiDeployed = await FlashSwapPangoSushi.deploy(
-            pangolinFactory,
-            sushiRouter
-        )
-        flashSwapPango = new ethers.Contract(
-            flashSwapPangoSushiDeployed.address,
-            flashSwapPangoSushiDeployed.interface,
-            flashSwapPangoSushiDeployed.signer
-        )
-        // }
+        flashSwapSecond = flashSwapSecondDeployed.address
     } else {
-        // if (swapFrom === ContractOptions.SUSHI_SWAP) {
-        //     const FlashSwapSushiPangoArtifact = await artifacts.readArtifact('FlashSwapSushiPango')
-        //     flashSwapContact = new ethers.Contract(
-        //         flashSwapSushiPangoAddr,
-        //         FlashSwapSushiPangoArtifact.abi,
-        //         signers[0]
-        //     )
-        // } else if (swapFrom === ContractOptions.PANGOLIN) {
-        //     const FlashSwapPangolinSushiArtifact = await artifacts.readArtifact(
-        //         'FlashSwapPangolinSushi'
-        //     )
-        //     flashSwapContact = new ethers.Contract(
-        //         flashSwapPangolinSushiAddr,
-        //         FlashSwapPangolinSushiArtifact.abi,
-        //         signers[0]
-        //     )
-        // }
+        // flashSwapFirst = flashSwapSushiPangoAddr
+        // flashSwapSecond = flashSwapPangolinSushiAddr
     }
 
     const IUniswapV2PairArtifact = await artifacts.readArtifact('IUniswapV2Pair')
     const IPangolinPairArtifact = await artifacts.readArtifact('IPangolinPair')
 
-    const sushiFactoryContract = new ethers.Contract(
-        sushiFactory, // Factory Address
-        IUniswapV2FactoryAbi,
+    const firstFactoryContract = new ethers.Contract(
+        namedAccounts[FactoryNamedAccounts[firstDex]], // Factory Address
+        IUniswapV2FactoryAbi, // todo
         signers[0]
     )
 
-    const pangolinFactoryContract = new ethers.Contract(
-        pangolinFactory, // Factory Address
-        IPangolinFactoryArtifact.abi,
+    const secondFactoryContract = new ethers.Contract(
+        namedAccounts[FactoryNamedAccounts[secondDex]], // Factory Address
+        IPangolinFactoryArtifact.abi, // todo
         signers[0]
     )
 
-    const sushiPair = new ethers.Contract(
-        await sushiFactoryContract.getPair(firstTokenAddress, secondTokenAddress),
-        IUniswapV2PairArtifact.abi,
+    const firstPair = new ethers.Contract(
+        await firstFactoryContract.getPair(firstTokenAddress, secondTokenAddress),
+        IUniswapV2PairArtifact.abi, // todo
         signers[0]
     )
 
-    const pangolinPair = new ethers.Contract(
-        await pangolinFactoryContract.getPair(firstTokenAddress, secondTokenAddress),
-        IPangolinPairArtifact.abi,
+    const secondPair = new ethers.Contract(
+        await secondFactoryContract.getPair(firstTokenAddress, secondTokenAddress),
+        IPangolinPairArtifact.abi, // todo
         signers[0]
     )
+
+    const tokens =
+        firstTokenAddress < secondTokenAddress
+            ? { token0: firstTokenAddress, token1: secondTokenAddress }
+            : { token0: secondTokenAddress, token1: firstTokenAddress }
 
     return {
-        sushiPair,
-        pangolinPair,
-        flashSwapSushi,
-        flashSwapPango,
+        firstPair,
+        secondPair,
+        flashSwapFirst,
+        flashSwapSecond,
+        tokens,
     }
 }
 

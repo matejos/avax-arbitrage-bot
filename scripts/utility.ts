@@ -79,3 +79,41 @@ export function findMaxProfit(reserves: ReservesType): {
         profit: computeProfitForTokenAmount(tokenAmount, reserves),
     }
 }
+
+export async function calculateGasCost(): Promise<number> {
+    try {
+        // Get current AVAX price from Chainlink
+        // const avaxPrice = await getChainlinkPrice(ChainlinkPriceOptions.AXAX)
+
+        // Use price to calculate gas cost
+        // const gas = 21000;
+        const gas = 260000
+        let gasPrice = (await ethers.provider.getGasPrice()) as BigNumber
+        const feeData = (await ethers.provider.getFeeData()) as {
+            gasPrice: BigNumber
+            maxFeePerGas: BigNumber
+            maxPriorityFeePerGas: BigNumber
+        }
+
+        console.log('Fee Data Gas Price', feeData.gasPrice.toString())
+        console.log('Fee Data Max Fee Per Gas', feeData.maxFeePerGas.toString())
+        console.log('Fee Data Max Priority Fee Per Gas', feeData.maxPriorityFeePerGas.toString())
+
+        if (gasPrice.toNumber() < 30000000000) {
+            gasPrice = expandToXDecimals(30, 9) // Make sure gas price is no less then 28 gwei
+        }
+
+        const gasCost = gasPrice.mul(gas)
+
+        console.log('Gas Price', gasPrice.toString())
+        console.log('Gas Cost w/o price', gasCost.toString())
+
+        // console.log('Gas Cost w/o price', gasCost);
+        // console.log('Gas cost with price', bigNumberToNumber(avaxPrice.mul(gasCost)))
+
+        // return bigNumberToNumber(avaxPrice.mul(gasCost))
+        return bigNumberToNumber(gasCost)
+    } catch (err) {
+        console.log('Error while calculating gas cost', err)
+    }
+}

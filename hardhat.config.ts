@@ -26,6 +26,7 @@ const forkingData = FORK_FUJI
     ? {
           url: 'https://api.avax.network/ext/bc/C/rpc',
           blockNumber: 5249692, // 10 usdt to wavax sushi to pangolin (project profit 1135402592789238 wavax)
+          // blockNumber: 5252814, // 1 wavax to joe traderjoe to pangolin (projected profit 239483049727551773 wavax aka 0.239483049727551773)
       }
     : undefined
 
@@ -75,7 +76,7 @@ const config: HardhatUserConfig = {
     },
     networks: {
         hardhat: {
-            gasPrice: 25000000000, //225000000000,
+            gasPrice: 250000000000,
             chainId: !forkingData ? 43112 : 43114,
             forking: forkingData,
         },
@@ -172,6 +173,12 @@ const config: HardhatUserConfig = {
             hardhat: '0xc7198437980c041c805A1EDcbA50c1Ce5db95118',
             fuji: '0x320f9A00BDDFE466887A8D0390cF32e9373fFc9f',
             mainnet: '0xc7198437980c041c805A1EDcbA50c1Ce5db95118',
+        },
+        joe: {
+            default: '0x2E4828F1a2dFC54d15Ef398ee4d0BE26d7211d56',
+            hardhat: '0x6e84a6216eA6dACC71eE8E6b0a5B7322EEbC0fDd',
+            fuji: '0x2E4828F1a2dFC54d15Ef398ee4d0BE26d7211d56',
+            mainnet: '0x6e84a6216eA6dACC71eE8E6b0a5B7322EEbC0fDd',
         },
     },
     // external: {
