@@ -45,6 +45,7 @@ contract FlashSwapPangolin is IPangolinCallee {
         pathReverse[0] = path[1];
         pathReverse[1] = path[0];
         uint amountRequired = PangolinLibrary.getAmountsIn(factory, amountToken, pathReverse)[0];
+        console.log('amountRequired', amountRequired);
         uint amountReceived = router.swapTokensForExactTokens(amountRequired, amountToken, path, msg.sender, block.timestamp + deadline)[0];
 
         TransferHelper.safeTransfer(address(token), sender, amountToken - amountReceived); // send me the profits!

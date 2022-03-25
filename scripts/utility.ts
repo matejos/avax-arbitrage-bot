@@ -1,5 +1,8 @@
 import { BigNumber } from 'ethers'
-import { ethers } from 'hardhat'
+import { ethers, getNamedAccounts } from 'hardhat'
+import AggregatorV3InterfaceABI from './AggregatorV3InterfaceABI'
+import { Tokens } from './constants'
+import { MaxProfitResult } from './types'
 
 export type ReservesType = {
     primaryA: BigNumber
@@ -46,10 +49,7 @@ export function computeProfitForTokenAmount(x: BigNumber, reserves: ReservesType
     )
 }
 
-export function findMaxProfit(reserves: ReservesType): {
-    tokenAmount: BigNumber
-    profit: BigNumber
-} {
+export function findMaxProfit(reserves: ReservesType): MaxProfitResult {
     let a = BigNumber.from(0)
     let b = (
         reserves.primaryA.lt(reserves.secondaryA) ? reserves.primaryA : reserves.secondaryA
@@ -80,14 +80,33 @@ export function findMaxProfit(reserves: ReservesType): {
     }
 }
 
-export async function calculateGasCost(): Promise<number> {
+export async function getChainlinkPrice(token: Tokens): Promise<BigNumber | null> {
+    try {
+        const tokenChainLink = (await getNamedAccounts())[`${token}ChainLink`]
+        if (!tokenChainLink) {
+            return null
+        }
+        const priceFeed = new ethers.Contract(
+            tokenChainLink,
+            AggregatorV3InterfaceABI,
+            ethers.provider
+        )
+        const roundData = await priceFeed.latestRoundData()
+        return expandToXDecimals(bigNumberToNumber(roundData.answer), 10)
+    } catch (err) {
+        // console.log('Error getting price feed from chain link', err)
+        return null
+    }
+}
+
+export async function calculateGasCost(): Promise<BigNumber> {
     try {
         // Get current AVAX price from Chainlink
-        // const avaxPrice = await getChainlinkPrice(ChainlinkPriceOptions.AXAX)
+        const avaxPrice = await getChainlinkPrice(Tokens.WAVAX)
+        console.log('AVAX price', bigNumberToNumber(avaxPrice))
 
         // Use price to calculate gas cost
-        // const gas = 21000;
-        const gas = 260000
+        const gas = 240000
         let gasPrice = (await ethers.provider.getGasPrice()) as BigNumber
         const feeData = (await ethers.provider.getFeeData()) as {
             gasPrice: BigNumber
@@ -99,20 +118,21 @@ export async function calculateGasCost(): Promise<number> {
         console.log('Fee Data Max Fee Per Gas', feeData.maxFeePerGas.toString())
         console.log('Fee Data Max Priority Fee Per Gas', feeData.maxPriorityFeePerGas.toString())
 
-        if (gasPrice.toNumber() < 30000000000) {
-            gasPrice = expandToXDecimals(30, 9) // Make sure gas price is no less then 28 gwei
+        if (gasPrice.toNumber() < 25000000000) {
+            gasPrice = expandToXDecimals(25, 9) // Make sure gas price is no less then 25 gwei
         }
 
         const gasCost = gasPrice.mul(gas)
 
         console.log('Gas Price', gasPrice.toString())
-        console.log('Gas Cost w/o price', gasCost.toString())
+        console.log('Gas Cost in avax', bigNumberToNumber(gasCost))
 
-        // console.log('Gas Cost w/o price', gasCost);
-        // console.log('Gas cost with price', bigNumberToNumber(avaxPrice.mul(gasCost)))
+        console.log(
+            'Gas cost in usd',
+            bigNumberToNumber(gasCost.mul(avaxPrice).div(expandTo18Decimals(1)))
+        )
 
-        // return bigNumberToNumber(avaxPrice.mul(gasCost))
-        return bigNumberToNumber(gasCost)
+        return gasCost.mul(avaxPrice).div(expandTo18Decimals(1))
     } catch (err) {
         console.log('Error while calculating gas cost', err)
     }

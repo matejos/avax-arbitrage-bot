@@ -4,6 +4,7 @@ import IUniswapV2FactoryAbi from '@sushiswap/core/build/abi/IUniswapV2Factory.js
 import IPangolinFactoryArtifact from '@pangolindex/exchange-contracts/artifacts/contracts/pangolin-core/interfaces/IPangolinFactory.sol/IPangolinFactory.json'
 import { Contract } from 'ethers'
 import { SetupResult } from './types'
+import { Tokens } from './constants'
 
 export enum DEX {
     PANGOLIN,
@@ -41,9 +42,9 @@ const RouterNamedAccounts: { [key in DEX]: string } = {
 //     [DEX.TRADERJOE]: 'joeRouter',
 // }
 
-const setupPangolinSushi = async (
-    firstTokenAddress: string,
-    secondTokenAddress: string,
+const setupArbitrage = async (
+    firstToken: Tokens,
+    secondToken: Tokens,
     firstDex: DEX,
     secondDex: DEX
 ): Promise<SetupResult> => {
@@ -85,6 +86,8 @@ const setupPangolinSushi = async (
         signers[0]
     )
 
+    const firstTokenAddress = namedAccounts[firstToken]
+    const secondTokenAddress = namedAccounts[secondToken]
     const firstPair = new ethers.Contract(
         await firstFactoryContract.getPair(firstTokenAddress, secondTokenAddress),
         IUniswapV2PairArtifact.abi, // todo
@@ -99,8 +102,8 @@ const setupPangolinSushi = async (
 
     const tokens =
         firstTokenAddress < secondTokenAddress
-            ? { token0: firstTokenAddress, token1: secondTokenAddress }
-            : { token0: secondTokenAddress, token1: firstTokenAddress }
+            ? { token0: firstToken, token1: secondToken }
+            : { token0: secondToken, token1: firstToken }
 
     return {
         firstPair,
@@ -111,4 +114,4 @@ const setupPangolinSushi = async (
     }
 }
 
-export default setupPangolinSushi
+export default setupArbitrage

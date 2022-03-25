@@ -1,8 +1,9 @@
 import 'dotenv/config'
 import { ethers, getNamedAccounts } from 'hardhat'
 import { Contract } from 'ethers'
-import setupPangolinSushi, { DEX } from '../../setupPangolinSushi'
+import setupArbitrage, { DEX } from '../../setupArbitrage'
 import executeFlashSwap from '../../executeFlashSwap'
+import { Tokens } from '../../constants'
 
 // const privateKey = process.env.MNEMONIC
 // const flashSwapperAddress = process.env.FLASH_SWAPPER
@@ -10,7 +11,7 @@ import executeFlashSwap from '../../executeFlashSwap'
 const runBot = async () => {
     const { wavax, joe } = await getNamedAccounts()
 
-    const setup = await setupPangolinSushi(wavax, joe, DEX.PANGOLIN, DEX.TRADERJOE)
+    const setup = await setupArbitrage(Tokens.WAVAX, Tokens.JOE, DEX.PANGOLIN, DEX.TRADERJOE)
 
     const signer = (await ethers.getSigners())[0].address
     const Wavax = await ethers.getContractAt('IWAVAX', wavax)

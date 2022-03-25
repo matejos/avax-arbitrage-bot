@@ -25,8 +25,11 @@ const forkingData = FORK_FUJI
     : FORK_MAINNET
     ? {
           url: 'https://api.avax.network/ext/bc/C/rpc',
-          blockNumber: 5249692, // 10 usdt to wavax sushi to pangolin (project profit 1135402592789238 wavax)
-          // blockNumber: 5252814, // 1 wavax to joe traderjoe to pangolin (projected profit 239483049727551773 wavax aka 0.239483049727551773)
+          //   blockNumber: 5249692, // 10 usdt to wavax sushi to pangolin (project profit 1135402592789238 wavax)
+          //   blockNumber: 5252814, // 1 wavax to joe, traderjoe to pangolin (projected profit 239483049727551773 wavax aka 0.239483049727551773)
+          blockNumber: 8922166 - 2, // 25 joe to wavax, Joe to Pangolin (profit 153811672432513862724877300000000000)
+          //   blockNumber: 5252814 - 2, // 1 wavax to joe traderjoe to pangolin (projected profit 239483049727551773 wavax aka 0.239483049727551773)
+          //   blockNumber: 5306013 - 2, // 1 wavax to joe traderjoe to pangolin (projected profit 50809123602056431 wavax aka 0.050809123602056431)
       }
     : undefined
 
@@ -76,7 +79,8 @@ const config: HardhatUserConfig = {
     },
     networks: {
         hardhat: {
-            gasPrice: 250000000000,
+            // gasPrice: 250000000000,
+            gasPrice: 300000000000,
             chainId: !forkingData ? 43112 : 43114,
             forking: forkingData,
         },
@@ -179,6 +183,20 @@ const config: HardhatUserConfig = {
             hardhat: '0x6e84a6216eA6dACC71eE8E6b0a5B7322EEbC0fDd',
             fuji: '0x2E4828F1a2dFC54d15Ef398ee4d0BE26d7211d56',
             mainnet: '0x6e84a6216eA6dACC71eE8E6b0a5B7322EEbC0fDd',
+        },
+        wavaxChainLink: {
+            hardhat: '0x0A77230d17318075983913bC2145DB16C7366156',
+            fuji: '0x5498BB86BC934c8D34FDA08E81D444153d0D06aD',
+            mainnet: '0x0A77230d17318075983913bC2145DB16C7366156',
+        },
+        joeChainLink: {
+            hardhat: '0x02D35d3a8aC3e1626d3eE09A78Dd87286F5E8e3a',
+            mainnet: '0x02D35d3a8aC3e1626d3eE09A78Dd87286F5E8e3a',
+        },
+        usdtChainLink: {
+            hardhat: '0xEBE676ee90Fe1112671f19b6B7459bC678B67e8a',
+            fuji: '0x7898AcCC83587C3C55116c5230C17a6Cd9C71bad',
+            mainnet: '0xEBE676ee90Fe1112671f19b6B7459bC678B67e8a',
         },
     },
     // external: {

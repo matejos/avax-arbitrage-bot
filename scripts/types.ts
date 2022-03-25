@@ -1,4 +1,5 @@
-import { Contract } from 'ethers'
+import { BigNumber, Contract } from 'ethers'
+import { Tokens } from './constants'
 
 export type SetupResult = {
     firstPair: Contract
@@ -6,7 +7,12 @@ export type SetupResult = {
     flashSwapFirst: string
     flashSwapSecond: string
     tokens: {
-        token0: string
-        token1: string
+        token0: Tokens
+        token1: Tokens
     }
+}
+
+export type MaxProfitResult = {
+    tokenAmount: BigNumber
+    profit: BigNumber
 }
