@@ -6,10 +6,10 @@ import {
     expandTo18Decimals,
     findMaxProfit,
     isLocalEnv,
-    ReservesType,
 } from '../scripts/utility'
 import { Contract } from 'ethers'
 import setupTest from './testSetup'
+import { ReservesType } from '../scripts/types'
 
 chai.use(solidity)
 

@@ -8,9 +8,12 @@ import {
     expandTo18Decimals,
     findMaxProfit,
     getChainlinkPrice,
+    setupNewBlock,
 } from './utility'
 
 const executeFlashSwap = async (setup: SetupResult): Promise<any> => {
+    setupNewBlock()
+
     const { firstPair, secondPair, flashSwapFirst, flashSwapSecond, tokens } = setup
 
     console.log('first pair', firstPair.address)
@@ -111,9 +114,6 @@ const executeFlashSwap = async (setup: SetupResult): Promise<any> => {
     const arbitrageAmount = startWithToken0
         ? maxProfitCalcStartingToken0.tokenAmount
         : maxProfitCalcStartingToken1.tokenAmount
-    const profit = startWithToken0
-        ? maxProfitCalcStartingToken0.profit
-        : maxProfitCalcStartingToken1.profit
     console.log('Should we start with token0?', startWithToken0)
     console.log('Should we start with first DEX?', shouldStartFirstDEX)
     console.log('Block Number', await ethers.provider.getBlockNumber())
@@ -140,10 +140,17 @@ const executeFlashSwap = async (setup: SetupResult): Promise<any> => {
         'Gas Used': receipt && receipt.gasUsed ? receipt.gasUsed.toString() : null,
         'Gas Price': tx.gasPrice.toString(),
         'Gas Fee': receipt && receipt.gasUsed ? receipt.gasUsed.mul(tx.gasPrice).toString() : null,
-        Profit: bigNumberToNumber(profit),
+        Profit: bigNumberToNumber(profitInUsd),
         Net:
             receipt && receipt.gasUsed
-                ? bigNumberToNumber(profit.sub(receipt.gasUsed.mul(tx.gasPrice)))
+                ? bigNumberToNumber(
+                      profitInUsd.sub(
+                          receipt.gasUsed
+                              .mul(tx.gasPrice)
+                              .mul(await getChainlinkPrice(Tokens.WAVAX))
+                              .div(expandTo18Decimals(1))
+                      )
+                  )
                 : null,
         Timestamp: new Date(Date.now()),
     }

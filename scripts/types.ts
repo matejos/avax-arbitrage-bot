@@ -16,3 +16,10 @@ export type MaxProfitResult = {
     tokenAmount: BigNumber
     profit: BigNumber
 }
+
+export type ReservesType = {
+    primaryA: BigNumber
+    primaryB: BigNumber
+    secondaryA: BigNumber
+    secondaryB: BigNumber
+}

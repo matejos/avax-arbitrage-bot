@@ -2,13 +2,12 @@ import { BigNumber } from 'ethers'
 import { ethers, getNamedAccounts } from 'hardhat'
 import AggregatorV3InterfaceABI from './AggregatorV3InterfaceABI'
 import { Tokens } from './constants'
-import { MaxProfitResult } from './types'
+import { MaxProfitResult, ReservesType } from './types'
 
-export type ReservesType = {
-    primaryA: BigNumber
-    primaryB: BigNumber
-    secondaryA: BigNumber
-    secondaryB: BigNumber
+let chainLinkPricesCache: { [token in Tokens]?: BigNumber } = {}
+
+export function setupNewBlock() {
+    chainLinkPricesCache = {}
 }
 
 export function isLocalEnv(envName: string) {
@@ -82,6 +81,7 @@ export function findMaxProfit(reserves: ReservesType): MaxProfitResult {
 
 export async function getChainlinkPrice(token: Tokens): Promise<BigNumber | null> {
     try {
+        if (chainLinkPricesCache[token]) return chainLinkPricesCache[token]
         const tokenChainLink = (await getNamedAccounts())[`${token}ChainLink`]
         if (!tokenChainLink) {
             return null
@@ -92,7 +92,9 @@ export async function getChainlinkPrice(token: Tokens): Promise<BigNumber | null
             ethers.provider
         )
         const roundData = await priceFeed.latestRoundData()
-        return expandToXDecimals(bigNumberToNumber(roundData.answer), 10)
+        const result = expandToXDecimals(bigNumberToNumber(roundData.answer), 10)
+        chainLinkPricesCache[token] = result
+        return result
     } catch (err) {
         // console.log('Error getting price feed from chain link', err)
         return null

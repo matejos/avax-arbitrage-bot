@@ -79,8 +79,8 @@ const config: HardhatUserConfig = {
     },
     networks: {
         hardhat: {
-            // gasPrice: 250000000000,
-            gasPrice: 300000000000,
+            gasPrice: 25000000000,
+            // gasPrice: 300000000000,
             chainId: !forkingData ? 43112 : 43114,
             forking: forkingData,
         },
