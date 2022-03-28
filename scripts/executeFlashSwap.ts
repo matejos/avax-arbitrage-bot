@@ -1,5 +1,5 @@
-import { BigNumber, Contract } from 'ethers'
-import { ethers, getNamedAccounts } from 'hardhat'
+import { BigNumber } from 'ethers'
+import { ethers } from 'hardhat'
 import { Tokens } from './constants'
 import { MaxProfitResult, SetupResult } from './types'
 import {
@@ -25,7 +25,6 @@ const executeFlashSwap = async (setup: SetupResult): Promise<any> => {
     const firstReserve1 = firstReserves[1]
     const secondReserve0 = secondReserves[0]
     const secondReserve1 = secondReserves[1]
-    const { usdt } = await getNamedAccounts()
     console.log(
         `first reserves ${ethers.utils.formatUnits(
             firstReserve0,
@@ -45,6 +44,14 @@ const executeFlashSwap = async (setup: SetupResult): Promise<any> => {
     const priceSecond = secondReserve0 / secondReserve1
     console.log('priceFirst', priceFirst)
     console.log('priceSecond', priceSecond)
+
+    const diffPct = Math.abs((priceFirst / priceSecond - 1) * 100)
+    console.log('diffPct', diffPct)
+
+    if (diffPct < 0.6) {
+        console.log('Difference in prices too low.')
+        return
+    }
 
     const shouldStartFirstDEXForToken0 = priceFirst > priceSecond
     const reserves = {
@@ -118,7 +125,7 @@ const executeFlashSwap = async (setup: SetupResult): Promise<any> => {
     console.log('Should we start with first DEX?', shouldStartFirstDEX)
     console.log('Block Number', await ethers.provider.getBlockNumber())
     if (profitInUsd.lt(gasCost)) {
-        console.log('Arbitrage not profitable.')
+        console.log('Arbitrage not profitable after gas costs.')
         return
     }
 
@@ -135,13 +142,13 @@ const executeFlashSwap = async (setup: SetupResult): Promise<any> => {
     const logTable = {}
 
     logTable[tx.hash] = {
-        'Block Number': await ethers.provider.getBlockNumber(),
+        'Block #': await ethers.provider.getBlockNumber(),
         'Gas Limit': tx.gasLimit.toString(),
         'Gas Used': receipt && receipt.gasUsed ? receipt.gasUsed.toString() : null,
         'Gas Price': tx.gasPrice.toString(),
         'Gas Fee': receipt && receipt.gasUsed ? receipt.gasUsed.mul(tx.gasPrice).toString() : null,
-        Profit: bigNumberToNumber(profitInUsd),
-        Net:
+        'Gross Gain': bigNumberToNumber(profitInUsd).toFixed(4),
+        'Net Profit':
             receipt && receipt.gasUsed
                 ? bigNumberToNumber(
                       profitInUsd.sub(
@@ -150,7 +157,7 @@ const executeFlashSwap = async (setup: SetupResult): Promise<any> => {
                               .mul(await getChainlinkPrice(Tokens.WAVAX))
                               .div(expandTo18Decimals(1))
                       )
-                  )
+                  ).toFixed(4)
                 : null,
         Timestamp: new Date(Date.now()),
     }
