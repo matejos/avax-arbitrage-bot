@@ -111,9 +111,13 @@ const executeFlashSwap = async (setup: SetupResult): Promise<any> => {
         console.log('Profit prediction token1 in usd', bigNumberToNumber(profitStartingToken1))
     }
 
-    const gasCost = await calculateGasCost()
     const startWithToken0 = profitStartingToken0 > profitStartingToken1
     const profitInUsd = startWithToken0 ? profitStartingToken0 : profitStartingToken1
+
+    if (profitInUsd.lt(0)) {
+        console.log('Arbitrage not profitable.')
+        return
+    }
 
     const shouldStartFirstDEX = startWithToken0
         ? shouldStartFirstDEXForToken0
@@ -123,6 +127,7 @@ const executeFlashSwap = async (setup: SetupResult): Promise<any> => {
         : maxProfitCalcStartingToken1.tokenAmount
     console.log('Should we start with token0?', startWithToken0)
     console.log('Should we start with first DEX?', shouldStartFirstDEX)
+    const gasCost = await calculateGasCost()
     console.log('Block Number', await ethers.provider.getBlockNumber())
     if (profitInUsd.lt(gasCost)) {
         console.log('Arbitrage not profitable after gas costs.')

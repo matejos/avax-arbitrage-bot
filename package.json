@@ -10,8 +10,8 @@
         "console": "npx hardhat console",
         "deploy": "npx hardhat run scripts/deploy.ts",
         "test": "npx hardhat test",
-        "runbot": "npx hardhat run scripts/arbbot.ts",
-        "arb:wavax-joe:pangolin-joe": "npx hardhat run scripts/arb/wavax-joe/WavaxJoeArbPangolinJoe.ts"
+        "arb:wavax-joe:pangolin-joe": "npx hardhat run scripts/arb/wavax-joe/WavaxJoeArbPangolinJoe.ts",
+        "arb:wavax-usdt:sushi-pangolin": "npx hardhat run scripts/arb/wavax-usdt/WavaxUsdtArbSushiPangolin.ts"
     },
     "repository": {
         "type": "git",

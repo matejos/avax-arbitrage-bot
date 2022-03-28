@@ -3,3 +3,9 @@ export enum Tokens {
     JOE = 'joe',
     USDT = 'usdt',
 }
+
+export enum DEX {
+    PANGOLIN = 'Pangolin',
+    SUSHISWAP = 'Sushiswap',
+    TRADERJOE = 'TraderJoe',
+}

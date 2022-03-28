@@ -2,15 +2,8 @@ import { getNamedAccounts, network, artifacts, ethers } from 'hardhat'
 import { isLocalEnv } from './utility'
 import IUniswapV2FactoryAbi from '@sushiswap/core/build/abi/IUniswapV2Factory.json'
 import IPangolinFactoryArtifact from '@pangolindex/exchange-contracts/artifacts/contracts/pangolin-core/interfaces/IPangolinFactory.sol/IPangolinFactory.json'
-import { Contract } from 'ethers'
 import { SetupResult } from './types'
-import { Tokens } from './constants'
-
-export enum DEX {
-    PANGOLIN,
-    SUSHISWAP,
-    TRADERJOE,
-}
+import { Tokens, DEX } from './constants'
 
 const FlashSwapContractNames: { [key in DEX]: string } = {
     [DEX.PANGOLIN]: 'FlashSwapPangolin',
@@ -29,18 +22,6 @@ const RouterNamedAccounts: { [key in DEX]: string } = {
     [DEX.SUSHISWAP]: 'sushiRouter',
     [DEX.TRADERJOE]: 'joeRouter',
 }
-
-// const RouterNamedAccounts: { [key in DEX]: string } = {
-//     [DEX.PANGOLIN]: 'pangolinRouter',
-//     [DEX.SUSHISWAP]: 'sushiRouter',
-//     [DEX.TRADERJOE]: 'joeRouter',
-// }
-
-// const RouterNamedAccounts: { [key in DEX]: string } = {
-//     [DEX.PANGOLIN]: 'pangolinRouter',
-//     [DEX.SUSHISWAP]: 'sushiRouter',
-//     [DEX.TRADERJOE]: 'joeRouter',
-// }
 
 const setupArbitrage = async (
     firstToken: Tokens,
@@ -67,6 +48,7 @@ const setupArbitrage = async (
         )
         flashSwapSecond = flashSwapSecondDeployed.address
     } else {
+        // todo
         // flashSwapFirst = flashSwapSushiPangoAddr
         // flashSwapSecond = flashSwapPangolinSushiAddr
     }

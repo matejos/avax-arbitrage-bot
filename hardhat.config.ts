@@ -25,9 +25,9 @@ const forkingData = FORK_FUJI
     : FORK_MAINNET
     ? {
           url: 'https://api.avax.network/ext/bc/C/rpc',
-          //   blockNumber: 5249692, // 10 usdt to wavax sushi to pangolin (project profit 1135402592789238 wavax)
+          blockNumber: 5249692 - 2, // 10 usdt to wavax sushi to pangolin (project profit 1135402592789238 wavax)
           //   blockNumber: 5252814, // 1 wavax to joe, traderjoe to pangolin (projected profit 239483049727551773 wavax aka 0.239483049727551773)
-          blockNumber: 8922166 - 2, // 25 joe to wavax, Joe to Pangolin (profit 153811672432513862724877300000000000)
+          //   blockNumber: 8922166 - 2, // 25 joe to wavax, Joe to Pangolin (profit 153811672432513862724877300000000000)
           //   blockNumber: 5252814 - 2, // 1 wavax to joe traderjoe to pangolin (projected profit 239483049727551773 wavax aka 0.239483049727551773)
           //   blockNumber: 5306013 - 2, // 1 wavax to joe traderjoe to pangolin (projected profit 50809123602056431 wavax aka 0.050809123602056431)
       }
