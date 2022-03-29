@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >= 0.6.12;
 
-import "hardhat/console.sol";
 import '@sushiswap/core/contracts/interfaces/IERC20.sol';
 import '@sushiswap/core/contracts/uniswapv2/interfaces/IUniswapV2Callee.sol';
 import "@sushiswap/core/contracts/uniswapv2/interfaces/IUniswapV2Pair.sol";

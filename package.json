@@ -2,7 +2,6 @@
     "name": "avax-arbitrage-bot",
     "version": "1.0.0",
     "description": "Avalanche Arbitrage Bot for bounty https://docs.google.com/document/d/13sfGbXdJl9gLHDQ-myG3XZgEQUHLQJIEon2qhE9fCvA/edit",
-    "main": "index.js",
     "scripts": {
         "accounts": "npx hardhat accounts",
         "balances": "npx hardhat balances",

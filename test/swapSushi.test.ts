@@ -7,7 +7,7 @@ import {
     findMaxProfit,
     isLocalEnv,
 } from '../scripts/utility'
-import { Contract } from 'ethers'
+import { BigNumber, Contract } from 'ethers'
 import setupTest from './testSetup'
 import { ReservesType } from '../scripts/types'
 
@@ -60,23 +60,12 @@ describe('Simple swapping test', function () {
             secondaryB: pangoUSDTAmount,
         }
         const maxProfitCalc = findMaxProfit(reserves)
-        console.log(
-            'arbitrage amount',
-            ethers.utils.formatEther(maxProfitCalc.tokenAmount.toString())
-        )
-        console.log(
-            'projected profit (excluding gas costs)',
-            ethers.utils.formatEther(maxProfitCalc.profit.toString())
-        )
 
-        // Fgure out which token is which
         const sushiPairToken0 = await sushiWavaxUsdt.token0()
-        // If token0 is USDT then set amount0 to  0 else set its value to 1 since its WAVAX
         const amount0 =
-            sushiPairToken0 === usdt.address ? expandTo18Decimals(0) : maxProfitCalc.tokenAmount
-        // If token0 is USDT then set amount1 to 1 else set its value to 0 since its USDT
+            sushiPairToken0 === usdt.address ? BigNumber.from(0) : maxProfitCalc.tokenAmount
         const amount1 =
-            sushiPairToken0 === usdt.address ? maxProfitCalc.tokenAmount : expandTo18Decimals(0)
+            sushiPairToken0 === usdt.address ? maxProfitCalc.tokenAmount : BigNumber.from(0)
 
         const balanceBefore = await wavax.balanceOf(user)
 
@@ -119,21 +108,10 @@ describe('Simple swapping test', function () {
             secondaryB: pangoWavaxAmount,
         }
         const maxProfitCalc = findMaxProfit(reserves)
-        console.log(
-            'arbitrage amount',
-            ethers.utils.formatEther(maxProfitCalc.tokenAmount.toString())
-        )
-        console.log(
-            'projected profit (excluding gas costs)',
-            ethers.utils.formatEther(maxProfitCalc.profit.toString())
-        )
 
-        // Fgure out which token is which
         const sushiPairToken0 = await sushiWavaxUsdt.token0()
-        // If token0 is USDT then set amount0 to  0 else set its value to 1 since its WAVAX
         const amount0 =
             sushiPairToken0 === wavax.address ? expandTo18Decimals(0) : maxProfitCalc.tokenAmount
-        // If token0 is USDT then set amount1 to 1 else set its value to 0 since its USDT
         const amount1 =
             sushiPairToken0 === wavax.address ? maxProfitCalc.tokenAmount : expandTo18Decimals(0)
 
