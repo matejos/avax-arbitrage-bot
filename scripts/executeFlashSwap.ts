@@ -6,6 +6,7 @@ import {
     bigNumberToNumber,
     calculateGasCost,
     expandTo18Decimals,
+    expandToXDecimals,
     findMaxProfit,
     getChainlinkPrice,
     setupNewBlock,
@@ -21,21 +22,22 @@ const executeFlashSwap = async (setup: SetupResult): Promise<any> => {
     const firstReserves = await firstPair.getReserves()
     const secondReserves = await secondPair.getReserves()
 
-    const firstReserve0 = firstReserves[0]
-    const firstReserve1 = firstReserves[1]
-    const secondReserve0 = secondReserves[0]
-    const secondReserve1 = secondReserves[1]
+    let firstReserve0 = firstReserves[0]
+    let firstReserve1 = firstReserves[1]
+    let secondReserve0 = secondReserves[0]
+    let secondReserve1 = secondReserves[1]
+    if (tokens.token0 === Tokens.USDT) {
+        firstReserve0 = expandToXDecimals(+firstReserve0.toString(), 12)
+        secondReserve0 = expandToXDecimals(+secondReserve0.toString(), 12)
+    } else if (tokens.token1 === Tokens.USDT) {
+        firstReserve1 = expandToXDecimals(+firstReserve1.toString(), 12)
+        secondReserve1 = expandToXDecimals(+secondReserve1.toString(), 12)
+    }
     console.log(
-        `first reserves ${ethers.utils.formatUnits(
-            firstReserve0,
-            tokens.token0 == Tokens.USDT ? 6 : 18
-        )} ${ethers.utils.formatUnits(firstReserve1, tokens.token1 == Tokens.USDT ? 6 : 18)}`
+        `first reserves ${bigNumberToNumber(firstReserve0)} ${bigNumberToNumber(firstReserve1)}`
     )
     console.log(
-        `second reserves ${ethers.utils.formatUnits(
-            secondReserve0,
-            tokens.token0 == Tokens.USDT ? 6 : 18
-        )} ${ethers.utils.formatUnits(secondReserve1, tokens.token1 == Tokens.USDT ? 6 : 18)}`
+        `second reserves ${bigNumberToNumber(secondReserve0)} ${bigNumberToNumber(secondReserve1)}`
     )
     console.log('tokens.token0', tokens.token0)
     console.log('tokens.token1', tokens.token1)
@@ -103,10 +105,7 @@ const executeFlashSwap = async (setup: SetupResult): Promise<any> => {
         )
         console.log(
             'Profit prediction token1 ',
-            ethers.utils.formatUnits(
-                maxProfitCalcStartingToken1.profit,
-                tokens.token1 == Tokens.USDT ? 6 : 18
-            )
+            bigNumberToNumber(maxProfitCalcStartingToken1.profit)
         )
         console.log('Profit prediction token1 in usd', bigNumberToNumber(profitStartingToken1))
     }
