@@ -103,13 +103,13 @@ const config: HardhatUserConfig = {
         },
         fuji: {
             url: 'https://api.avax-test.network/ext/bc/C/rpc',
-            gasPrice: 225000000000,
+            gasPrice: 30000000000,
             chainId: 43113,
             accounts,
         },
         mainnet: {
             url: 'https://api.avax.network/ext/bc/C/rpc',
-            gasPrice: 225000000000,
+            gasPrice: 30000000000,
             chainId: 43114,
             accounts,
         },
@@ -197,6 +197,18 @@ const config: HardhatUserConfig = {
             hardhat: '0xEBE676ee90Fe1112671f19b6B7459bC678B67e8a',
             fuji: '0x7898AcCC83587C3C55116c5230C17a6Cd9C71bad',
             mainnet: '0xEBE676ee90Fe1112671f19b6B7459bC678B67e8a',
+        },
+        flashSwapPangolinSushi: {
+            fuji: '0x6c5a72a30ab18A013307A514133144bBcac1f61d',
+        },
+        flashSwapSushiPangolin: {
+            fuji: '0x1e8FCe7624aF48BC71D38C0898b405d2C4645F46',
+        },
+        flashSwapPangolinJoe: {
+            fuji: '0xD919e81c5120F35C9D4A8147E2C221De5F75E69F',
+        },
+        flashSwapJoePangolin: {
+            fuji: '0x81A1419049A6731ab52505Da86cf077d850b3fEe',
         },
     },
     // external: {

@@ -3,25 +3,13 @@ import { isLocalEnv } from './utility'
 import IUniswapV2FactoryAbi from '@sushiswap/core/build/abi/IUniswapV2Factory.json'
 import IPangolinFactoryArtifact from '@pangolindex/exchange-contracts/artifacts/contracts/pangolin-core/interfaces/IPangolinFactory.sol/IPangolinFactory.json'
 import { SetupResult } from './types'
-import { Tokens, DEX } from './constants'
-
-const FlashSwapContractNames: { [key in DEX]: string } = {
-    [DEX.PANGOLIN]: 'FlashSwapPangolin',
-    [DEX.SUSHISWAP]: 'FlashSwapSushi',
-    [DEX.TRADERJOE]: 'FlashSwapJoe',
-}
-
-const FactoryNamedAccounts: { [key in DEX]: string } = {
-    [DEX.PANGOLIN]: 'pangolinFactory',
-    [DEX.SUSHISWAP]: 'sushiFactory',
-    [DEX.TRADERJOE]: 'joeFactory',
-}
-
-const RouterNamedAccounts: { [key in DEX]: string } = {
-    [DEX.PANGOLIN]: 'pangolinRouter',
-    [DEX.SUSHISWAP]: 'sushiRouter',
-    [DEX.TRADERJOE]: 'joeRouter',
-}
+import {
+    Tokens,
+    DEX,
+    FactoryNamedAccounts,
+    FlashSwapContractNames,
+    RouterNamedAccounts,
+} from './constants'
 
 const setupArbitrage = async (
     firstToken: Tokens,
@@ -48,9 +36,8 @@ const setupArbitrage = async (
         )
         flashSwapSecond = flashSwapSecondDeployed.address
     } else {
-        // todo
-        // flashSwapFirst = flashSwapSushiPangoAddr
-        // flashSwapSecond = flashSwapPangolinSushiAddr
+        flashSwapFirst = `flashSwap${firstDex}${secondDex}`
+        flashSwapSecond = `flashSwap${secondDex}${firstDex}`
     }
 
     const IUniswapV2PairArtifact = await artifacts.readArtifact('IUniswapV2Pair')

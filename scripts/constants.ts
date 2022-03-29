@@ -6,6 +6,24 @@ export enum Tokens {
 
 export enum DEX {
     PANGOLIN = 'Pangolin',
-    SUSHISWAP = 'Sushiswap',
-    TRADERJOE = 'TraderJoe',
+    SUSHISWAP = 'Sushi',
+    TRADERJOE = 'Joe',
+}
+
+export const FlashSwapContractNames: { [key in DEX]: string } = {
+    [DEX.PANGOLIN]: 'FlashSwapPangolin',
+    [DEX.SUSHISWAP]: 'FlashSwapSushi',
+    [DEX.TRADERJOE]: 'FlashSwapJoe',
+}
+
+export const FactoryNamedAccounts: { [key in DEX]: string } = {
+    [DEX.PANGOLIN]: 'pangolinFactory',
+    [DEX.SUSHISWAP]: 'sushiFactory',
+    [DEX.TRADERJOE]: 'joeFactory',
+}
+
+export const RouterNamedAccounts: { [key in DEX]: string } = {
+    [DEX.PANGOLIN]: 'pangolinRouter',
+    [DEX.SUSHISWAP]: 'sushiRouter',
+    [DEX.TRADERJOE]: 'joeRouter',
 }
