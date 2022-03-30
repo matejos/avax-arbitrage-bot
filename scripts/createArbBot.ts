@@ -2,7 +2,7 @@ import setupArbitrage from './setupArbitrage'
 import executeFlashSwap from './executeFlashSwap'
 import { DEX, Tokens } from './constants'
 import { ethers, network } from 'hardhat'
-import { isLocalEnv } from './utility'
+import { getNullAddress, isLocalEnv, logIfLocal } from './utility'
 
 export class ArbitrageStatus {
     public arbInProgress: boolean
@@ -15,10 +15,17 @@ const createAndStartArbBot = async (
     secondDex: DEX
 ) => {
     const setup = await setupArbitrage(firstToken, secondToken, firstDex, secondDex)
+    if (setup.firstPair.address == getNullAddress()) {
+        console.log('Token pair not found on 1st DEX')
+        return
+    } else if (setup.secondPair.address == getNullAddress()) {
+        console.log('Token pair not found on 2nd DEX')
+        return
+    }
     const arbStatus = new ArbitrageStatus()
     console.log(`${firstToken}-${secondToken}:${firstDex}-${secondDex} Bot started!`)
     ethers.provider.on('block', async (blockNumber) => {
-        console.log('block', blockNumber)
+        logIfLocal('block', blockNumber)
         executeFlashSwap(setup, arbStatus)
         if (isLocalEnv(network.name)) {
             ethers.provider.off('block')

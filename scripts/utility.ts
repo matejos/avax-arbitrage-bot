@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers'
-import { ethers, getNamedAccounts } from 'hardhat'
+import { ethers, getNamedAccounts, network } from 'hardhat'
 import AggregatorV3InterfaceABI from './AggregatorV3InterfaceABI'
 import { Tokens } from './constants'
 import { MaxProfitResult, ReservesType } from './types'
@@ -11,12 +11,17 @@ export function setupNewBlock() {
 }
 
 export function isLocalEnv(envName: string) {
-    return !!(
-        {
-            hardhat: true,
-            localhost: true,
-        } as Record<string, true>
-    )[envName]
+    return ['hardhat', 'local'].includes(envName)
+}
+
+export function logIfLocal(...args: any[]) {
+    if (isLocalEnv(network.name)) {
+        console.log(...args)
+    }
+}
+
+export function getNullAddress(): string {
+    return '0x0000000000000000000000000000000000000000'
 }
 
 export function expandTo18Decimals(n: number): BigNumber {
@@ -48,11 +53,13 @@ export function computeProfitForTokenAmount(x: BigNumber, reserves: ReservesType
     )
 }
 
+// Find approximation of token amount with maximum profit
 export function findMaxProfit(reserves: ReservesType): MaxProfitResult {
     let a = BigNumber.from(0)
     let b = (
         reserves.primaryA.lt(reserves.secondaryA) ? reserves.primaryA : reserves.secondaryA
     ).div(5)
+    // 10 steps is enough for approximation
     for (let i = 0; i < 10; i++) {
         const r = a.add(b.sub(a).div(3))
         const s = b.sub(b.sub(a).div(3))
@@ -105,20 +112,11 @@ export async function calculateGasCost(): Promise<BigNumber> {
     try {
         // Get current AVAX price from Chainlink
         const avaxPrice = await getChainlinkPrice(Tokens.WAVAX)
-        console.log('AVAX price', bigNumberToNumber(avaxPrice))
+        logIfLocal('AVAX price', bigNumberToNumber(avaxPrice))
 
         // Use price to calculate gas cost
         const gas = 280000
         let gasPrice = (await ethers.provider.getGasPrice()) as BigNumber
-        const feeData = (await ethers.provider.getFeeData()) as {
-            gasPrice: BigNumber
-            maxFeePerGas: BigNumber
-            maxPriorityFeePerGas: BigNumber
-        }
-
-        console.log('Fee Data Gas Price', feeData.gasPrice.toString())
-        console.log('Fee Data Max Fee Per Gas', feeData.maxFeePerGas.toString())
-        console.log('Fee Data Max Priority Fee Per Gas', feeData.maxPriorityFeePerGas.toString())
 
         if (gasPrice.toNumber() < 25000000000) {
             gasPrice = expandToXDecimals(25, 9) // Make sure gas price is no less then 25 gwei
@@ -126,11 +124,10 @@ export async function calculateGasCost(): Promise<BigNumber> {
 
         const gasCost = gasPrice.mul(gas)
 
-        console.log('Gas Price', gasPrice.toString())
-        console.log('Gas Cost in avax', bigNumberToNumber(gasCost))
+        logIfLocal('Max gas cost in avax', bigNumberToNumber(gasCost))
 
-        console.log(
-            'Gas cost in usd',
+        logIfLocal(
+            'Max gas cost in usd',
             bigNumberToNumber(gasCost.mul(avaxPrice).div(expandTo18Decimals(1)))
         )
 

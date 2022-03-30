@@ -1,6 +1,5 @@
 import { getNamedAccounts, network, artifacts, ethers } from 'hardhat'
 import { isLocalEnv } from './utility'
-import IUniswapV2FactoryAbi from '@sushiswap/core/build/abi/IUniswapV2Factory.json'
 import IPangolinFactoryArtifact from '@pangolindex/exchange-contracts/artifacts/contracts/pangolin-core/interfaces/IPangolinFactory.sol/IPangolinFactory.json'
 import { SetupResult } from './types'
 import {
@@ -41,17 +40,16 @@ const setupArbitrage = async (
         flashSwapSecond = namedAccounts[`flashSwap${secondDex}${firstDex}`]
     }
 
-    const IUniswapV2PairArtifact = await artifacts.readArtifact('IUniswapV2Pair')
     const IPangolinPairArtifact = await artifacts.readArtifact('IPangolinPair')
 
     const firstFactoryContract = new ethers.Contract(
-        namedAccounts[FactoryNamedAccounts[firstDex]], // Factory Address
-        IUniswapV2FactoryAbi, // todo
+        namedAccounts[FactoryNamedAccounts[firstDex]],
+        IPangolinFactoryArtifact.abi, // todo
         signers[0]
     )
 
     const secondFactoryContract = new ethers.Contract(
-        namedAccounts[FactoryNamedAccounts[secondDex]], // Factory Address
+        namedAccounts[FactoryNamedAccounts[secondDex]],
         IPangolinFactoryArtifact.abi, // todo
         signers[0]
     )
@@ -60,13 +58,13 @@ const setupArbitrage = async (
     const secondTokenAddress = namedAccounts[secondToken]
     const firstPair = new ethers.Contract(
         await firstFactoryContract.getPair(firstTokenAddress, secondTokenAddress),
-        IUniswapV2PairArtifact.abi, // todo
+        IPangolinPairArtifact.abi,
         signers[0]
     )
 
     const secondPair = new ethers.Contract(
         await secondFactoryContract.getPair(firstTokenAddress, secondTokenAddress),
-        IPangolinPairArtifact.abi, // todo
+        IPangolinPairArtifact.abi,
         signers[0]
     )
 

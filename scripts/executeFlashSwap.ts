@@ -11,21 +11,17 @@ import {
     findMaxProfit,
     getChainlinkPrice,
     isLocalEnv,
+    logIfLocal,
     setupNewBlock,
 } from './utility'
 
 const executeFlashSwap = async (setup: SetupResult, arbStatus: ArbitrageStatus): Promise<any> => {
     let arbStartedByMe = false
     try {
-        console.log('Block Number Start', await ethers.provider.getBlockNumber())
         setupNewBlock()
 
         const { firstPair, secondPair, flashSwapFirst, flashSwapSecond, tokens } = setup
 
-        console.log('first pair', firstPair.address)
-        console.log('second pair', secondPair.address)
-        console.log('flashSwapFirst', flashSwapFirst)
-        console.log('flashSwapSecond', flashSwapSecond)
         const firstReserves = await firstPair.getReserves()
         const secondReserves = await secondPair.getReserves()
 
@@ -40,27 +36,30 @@ const executeFlashSwap = async (setup: SetupResult, arbStatus: ArbitrageStatus):
             firstReserve1 = expandToXDecimals(+firstReserve1.toString(), 12)
             secondReserve1 = expandToXDecimals(+secondReserve1.toString(), 12)
         }
-        console.log(
-            `first reserves ${bigNumberToNumber(firstReserve0)} ${bigNumberToNumber(firstReserve1)}`
+        logIfLocal(
+            `1st DEX reserves ${bigNumberToNumber(firstReserve0)} ${bigNumberToNumber(
+                firstReserve1
+            )}`
         )
-        console.log(
-            `second reserves ${bigNumberToNumber(secondReserve0)} ${bigNumberToNumber(
+        logIfLocal(
+            `2nd DEX reserves ${bigNumberToNumber(secondReserve0)} ${bigNumberToNumber(
                 secondReserve1
             )}`
         )
-        console.log('tokens.token0', tokens.token0)
-        console.log('tokens.token1', tokens.token1)
+        logIfLocal('tokens.token0', tokens.token0)
+        logIfLocal('tokens.token1', tokens.token1)
 
         const priceFirst = firstReserve0 / firstReserve1
         const priceSecond = secondReserve0 / secondReserve1
-        console.log('priceFirst', priceFirst)
-        console.log('priceSecond', priceSecond)
+        logIfLocal(`Price on 1st DEX`, priceFirst)
+        logIfLocal(`Price on 2nd DEX`, priceSecond)
 
-        const diffPct = Math.abs((priceFirst / priceSecond - 1) * 100)
-        console.log('diffPct', diffPct)
+        const priceDiff = Math.abs(priceFirst / priceSecond - 1)
+        logIfLocal('Price difference', priceDiff * 100)
 
-        if (diffPct < 0.6) {
-            console.log('Difference in prices too low.')
+        // Price difference must be higher than 0.6% (swapping fees)
+        if (priceDiff < 0.006) {
+            logIfLocal('Difference in prices too low.')
             return
         }
 
@@ -78,27 +77,24 @@ const executeFlashSwap = async (setup: SetupResult, arbStatus: ArbitrageStatus):
         let profitStartingToken1: BigNumber = null
 
         const token0Price = await getChainlinkPrice(tokens.token0)
-        console.log('token0Price', token0Price)
         if (token0Price !== null) {
             maxProfitCalcStartingToken0 = findMaxProfit(reserves)
 
             profitStartingToken0 = maxProfitCalcStartingToken0.profit
                 .mul(token0Price)
                 .div(expandTo18Decimals(1))
-
-            console.log(
+            logIfLocal(
                 'Arbitrage amount token0 ',
                 bigNumberToNumber(maxProfitCalcStartingToken0.tokenAmount)
             )
-            console.log(
+            logIfLocal(
                 'Profit prediction token0 ',
                 bigNumberToNumber(maxProfitCalcStartingToken0.profit)
             )
-            console.log('Profit prediction token0 in usd', bigNumberToNumber(profitStartingToken0))
+            logIfLocal('Profit prediction token0 in usd', bigNumberToNumber(profitStartingToken0))
         }
 
         const token1Price = await getChainlinkPrice(tokens.token1)
-        console.log('token1Price', token1Price)
         if (token1Price !== null) {
             maxProfitCalcStartingToken1 = findMaxProfit({
                 primaryA: reserves.secondaryB,
@@ -111,22 +107,23 @@ const executeFlashSwap = async (setup: SetupResult, arbStatus: ArbitrageStatus):
                 .mul(token1Price)
                 .div(expandTo18Decimals(1))
 
-            console.log(
+            logIfLocal(
                 'Arbitrage amount token1  ',
                 bigNumberToNumber(maxProfitCalcStartingToken1.tokenAmount)
             )
-            console.log(
+            logIfLocal(
                 'Profit prediction token1 ',
                 bigNumberToNumber(maxProfitCalcStartingToken1.profit)
             )
-            console.log('Profit prediction token1 in usd', bigNumberToNumber(profitStartingToken1))
+            logIfLocal('Profit prediction token1 in usd', bigNumberToNumber(profitStartingToken1))
         }
 
         const startWithToken0 = profitStartingToken0 > profitStartingToken1
         const profitInUsd = startWithToken0 ? profitStartingToken0 : profitStartingToken1
+        logIfLocal('Max projected gross gain in usd', bigNumberToNumber(profitInUsd))
 
         if (profitInUsd.lt(0)) {
-            console.log('Arbitrage not profitable.')
+            logIfLocal('Arbitrage not profitable.')
             return
         }
 
@@ -136,12 +133,11 @@ const executeFlashSwap = async (setup: SetupResult, arbStatus: ArbitrageStatus):
         const arbitrageAmount = startWithToken0
             ? maxProfitCalcStartingToken0.tokenAmount
             : maxProfitCalcStartingToken1.tokenAmount
-        console.log('Should we start with token0?', startWithToken0)
-        console.log('Should we start with first DEX?', shouldStartFirstDEX)
+        logIfLocal('Should we start with token0?', startWithToken0)
+        logIfLocal('Should we start with first DEX?', shouldStartFirstDEX)
         const gasCost = await calculateGasCost()
-        console.log('Block Number End', await ethers.provider.getBlockNumber())
         if (profitInUsd.lt(gasCost)) {
-            console.log('Arbitrage not profitable after gas costs.')
+            logIfLocal('Arbitrage not profitable after deducting gas costs.')
             return
         }
 
@@ -149,7 +145,7 @@ const executeFlashSwap = async (setup: SetupResult, arbStatus: ArbitrageStatus):
         const amount1 = startWithToken0 ? expandTo18Decimals(0) : arbitrageAmount
 
         if (arbStatus.arbInProgress) {
-            console.log('Arbitrage already in progress.')
+            logIfLocal('Arbitrage already in progress.')
             return
         }
 
