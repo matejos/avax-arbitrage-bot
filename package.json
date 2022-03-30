@@ -10,7 +10,8 @@
         "deploy": "npx hardhat deploy",
         "test": "npx hardhat test",
         "arb:wavax-joe:pangolin-joe": "npx hardhat run scripts/arb/wavax-joe/WavaxJoeArbPangolinJoe.ts",
-        "arb:wavax-usdt:sushi-pangolin": "npx hardhat run scripts/arb/wavax-usdt/WavaxUsdtArbSushiPangolin.ts"
+        "arb:wavax-usdt:sushi-pangolin": "npx hardhat run scripts/arb/wavax-usdt/WavaxUsdtArbSushiPangolin.ts",
+        "arb:wavax-mycoin:pangolin-sushi": "npx hardhat run scripts/arb/wavax-mycoin/WavaxMycoinArbPangolinSushi.ts"
     },
     "repository": {
         "type": "git",

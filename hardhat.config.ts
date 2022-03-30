@@ -21,6 +21,7 @@ const FORK_MAINNET = false
 const forkingData = FORK_FUJI
     ? {
           url: 'https://api.avax-test.network/ext/bc/C/rpc',
+          //   blockNumber: 7978605, // 0.1 wavax to mycoin, sushi to pangolin (projected profit 0.0196427247506822 wavax) arb:wavax-mycoin:pangolin-sushi arbed at tx 0xcc89201cbe0b0345f85ffa4ba26c4fcab4ea4bda4559323fc76be2cf2fdf0fff
       }
     : FORK_MAINNET
     ? {
@@ -151,9 +152,9 @@ const config: HardhatUserConfig = {
             mainnet: '0x60aE616a2155Ee3d9A68541Ba4544862310933d4',
         },
         sushiFactory: {
-            default: '0x99653EfFF54a26bc24567A251F74d8A0A9905390',
+            default: '0xc35DADB65012eC5796536bD9864eD8773aBc74C4',
             hardhat: '0xc35DADB65012eC5796536bD9864eD8773aBc74C4',
-            fuji: '0x99653EfFF54a26bc24567A251F74d8A0A9905390',
+            fuji: '0xc35DADB65012eC5796536bD9864eD8773aBc74C4',
             mainnet: '0xc35DADB65012eC5796536bD9864eD8773aBc74C4',
         },
         sushiRouter: {
@@ -185,6 +186,7 @@ const config: HardhatUserConfig = {
             mainnet: '0x6e84a6216eA6dACC71eE8E6b0a5B7322EEbC0fDd',
         },
         wavaxChainLink: {
+            default: '0x5498BB86BC934c8D34FDA08E81D444153d0D06aD',
             hardhat: '0x0A77230d17318075983913bC2145DB16C7366156',
             fuji: '0x5498BB86BC934c8D34FDA08E81D444153d0D06aD',
             mainnet: '0x0A77230d17318075983913bC2145DB16C7366156',
@@ -199,38 +201,22 @@ const config: HardhatUserConfig = {
             mainnet: '0xEBE676ee90Fe1112671f19b6B7459bC678B67e8a',
         },
         flashSwapPangolinSushi: {
+            default: '0x6c5a72a30ab18A013307A514133144bBcac1f61d',
             fuji: '0x6c5a72a30ab18A013307A514133144bBcac1f61d',
         },
         flashSwapSushiPangolin: {
-            fuji: '0x1e8FCe7624aF48BC71D38C0898b405d2C4645F46',
+            default: '0x6d13c447381ce5c3374bDA61775fc74183128F45',
+            fuji: '0x6d13c447381ce5c3374bDA61775fc74183128F45',
         },
         flashSwapPangolinJoe: {
+            default: '0xD919e81c5120F35C9D4A8147E2C221De5F75E69F',
             fuji: '0xD919e81c5120F35C9D4A8147E2C221De5F75E69F',
         },
         flashSwapJoePangolin: {
+            default: '0x81A1419049A6731ab52505Da86cf077d850b3fEe',
             fuji: '0x81A1419049A6731ab52505Da86cf077d850b3fEe',
         },
     },
-    // external: {
-    //     contracts: [
-    //         {
-    //             artifacts: 'node_modules/@openzeppelin/contracts-upgradeable/build/contracts',
-    //         },
-    //         {
-    //             artifacts: 'node_modules/@pangolindex/exchange-contracts/artifacts',
-    //         },
-    //         {
-    //             artifacts: 'node_modules/@traderjoe-xyz/core/artifacts',
-    //         },
-    //     ],
-    //     deployments: {
-    //         //   example: ["node_modules/@cartesi/arbitration/build/contracts"],
-    //         //   default: ["node_modules/@uniswap/v2-periphery/build"],
-    //         //   hardhat: ['node_modules/@uniswap/v2-periphery/build', 'node_modules/@uniswap/v2-core/build'],
-    //         //   fuji: ['node_modules/@uniswap/v2-periphery/build'],
-    //         //   mainnet: ['node_modules/@uniswap/v2-periphery/builds']
-    //     },
-    // },
 }
 
 export default config

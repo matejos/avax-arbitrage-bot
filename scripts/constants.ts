@@ -2,6 +2,7 @@ export enum Tokens {
     WAVAX = 'wavax',
     JOE = 'joe',
     USDT = 'usdt',
+    MYCOIN = 'mycoin',
 }
 
 export enum DEX {

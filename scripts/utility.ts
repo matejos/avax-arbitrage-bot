@@ -108,7 +108,7 @@ export async function calculateGasCost(): Promise<BigNumber> {
         console.log('AVAX price', bigNumberToNumber(avaxPrice))
 
         // Use price to calculate gas cost
-        const gas = 240000
+        const gas = 280000
         let gasPrice = (await ethers.provider.getGasPrice()) as BigNumber
         const feeData = (await ethers.provider.getFeeData()) as {
             gasPrice: BigNumber

@@ -35,9 +35,10 @@ const setupArbitrage = async (
             namedAccounts[RouterNamedAccounts[firstDex]]
         )
         flashSwapSecond = flashSwapSecondDeployed.address
+        console.log('flashSwapSecondDeployed.address', flashSwapSecondDeployed.address)
     } else {
-        flashSwapFirst = `flashSwap${firstDex}${secondDex}`
-        flashSwapSecond = `flashSwap${secondDex}${firstDex}`
+        flashSwapFirst = namedAccounts[`flashSwap${firstDex}${secondDex}`]
+        flashSwapSecond = namedAccounts[`flashSwap${secondDex}${firstDex}`]
     }
 
     const IUniswapV2PairArtifact = await artifacts.readArtifact('IUniswapV2Pair')
