@@ -21,7 +21,7 @@ export interface V2Fixture {
 
 const setupTest = deployments.createFixture(
     async ({ deployments, getNamedAccounts, ethers }, options): Promise<V2Fixture> => {
-        await deployments.fixture() // ensure you start from a fresh deployments
+        await deployments.fixture([], { keepExistingDeployments: true }) // ensure you start from a fresh deployments
         const { deploy } = deployments
         const { deployer } = await getNamedAccounts()
         const signers = await ethers.getSigners()

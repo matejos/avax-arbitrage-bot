@@ -35,7 +35,7 @@ describe('Simple swapping test', function () {
     it('swap avax->usdt', async function () {
         const { deployer, user } = await getNamedAccounts()
 
-        // add liquidity to Joe at a rate of 1 AVAX / 100 USDT
+        // add liquidity to Sushi at a rate of 1 AVAX / 100 USDT
         const sushiUSDTAmount = expandTo18Decimals(10000)
         const sushiWavaxAmount = expandTo18Decimals(100)
         await usdt.mint(deployer, sushiUSDTAmount)
@@ -83,7 +83,7 @@ describe('Simple swapping test', function () {
     it('swap usdt->avax', async function () {
         const { deployer, user } = await getNamedAccounts()
 
-        // add liquidity to Joe at a rate of 1 AVAX / 120 USDT
+        // add liquidity to Sushi at a rate of 1 AVAX / 120 USDT
         const sushiUSDTAmount = expandTo18Decimals(12000)
         const sushiWavaxAmount = expandTo18Decimals(100)
         await usdt.mint(deployer, sushiUSDTAmount)
