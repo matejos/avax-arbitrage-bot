@@ -19,11 +19,8 @@ contract FlashSwapSushi is IUniswapV2Callee {
         factory = _factory;
     }
 
-    // needs to accept AVAX from any V1 exchange and WAVAX. ideally this could be enforced, as in the router,
-    // but it's not possible because it requires a call to the v1 factory, which takes too much gas
-    receive() external payable {}
-
-    // gets tokensA via V2 flash swap, swaps for tokensB on other router, repays, and keeps the rest!
+    // gets tokensA via V2 flash swap from first dex, swaps for required amount of tokensB via router of second dex,
+    // repays, and keeps the rest!
     function uniswapV2Call(address sender, uint amount0, uint amount1, bytes calldata data) external override {
         address[] memory path = new address[](2);
         uint amountToken;

@@ -5,6 +5,8 @@ import UniswapV2Factory from '../test/test-artifacts/sushiswap/UniswapV2Factory.
 import IUniswapV2Pair from '@uniswap/v2-core/build/IUniswapV2Pair.json'
 import { DEX, FactoryNamedAccounts, RouterNamedAccounts, Tokens } from './constants'
 
+// Temporary helper script, disregard.
+
 const addLiq = async (): Promise<void> => {
     const namedAccounts = await getNamedAccounts()
     const signers = await ethers.getSigners()

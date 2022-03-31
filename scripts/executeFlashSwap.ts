@@ -73,8 +73,8 @@ const executeFlashSwap = async (setup: SetupResult, arbStatus: ArbitrageStatus):
 
         let maxProfitCalcStartingToken0: MaxProfitResult,
             maxProfitCalcStartingToken1: MaxProfitResult
-        let profitStartingToken0: BigNumber = null
-        let profitStartingToken1: BigNumber = null
+        let profitStartingToken0: BigNumber = BigNumber.from(0)
+        let profitStartingToken1: BigNumber = BigNumber.from(0)
 
         const token0Price = await getChainlinkPrice(tokens.token0)
         if (token0Price !== null) {
@@ -120,12 +120,11 @@ const executeFlashSwap = async (setup: SetupResult, arbStatus: ArbitrageStatus):
 
         const startWithToken0 = profitStartingToken0 > profitStartingToken1
         const profitInUsd = startWithToken0 ? profitStartingToken0 : profitStartingToken1
-        logIfLocal('Max projected gross gain in usd', bigNumberToNumber(profitInUsd))
-
-        if (profitInUsd.lt(0)) {
+        if (profitInUsd.lte(0)) {
             logIfLocal('Arbitrage not profitable.')
             return
         }
+        logIfLocal('Max projected gross gain in usd', bigNumberToNumber(profitInUsd))
 
         const shouldStartFirstDEX = startWithToken0
             ? shouldStartFirstDEXForToken0
@@ -185,7 +184,7 @@ const executeFlashSwap = async (setup: SetupResult, arbStatus: ArbitrageStatus):
                           )
                       ).toFixed(4)
                     : null,
-            Timestamp: new Date(Date.now()),
+            // Timestamp: new Date(Date.now()),
         }
         console.table(logTable)
     } catch (err) {

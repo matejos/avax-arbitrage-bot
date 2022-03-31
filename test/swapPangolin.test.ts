@@ -13,7 +13,7 @@ import { ReservesType } from '../scripts/types'
 
 chai.use(solidity)
 
-describe('Sushilin->Pango FlashSwap', function () {
+describe('Pangolin->Sushi FlashSwap', function () {
     let flashSwapPango: Contract
     let wavax: Contract
     let usdt: Contract
