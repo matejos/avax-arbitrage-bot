@@ -16,11 +16,9 @@ const createAndStartArbBot = async (
 ) => {
     const setup = await setupArbitrage(firstToken, secondToken, firstDex, secondDex)
     if (setup.firstPair.address == getNullAddress()) {
-        console.log('Token pair not found on 1st DEX')
-        return
+        throw 'Token pair not found on 1st DEX'
     } else if (setup.secondPair.address == getNullAddress()) {
-        console.log('Token pair not found on 2nd DEX')
-        return
+        throw 'Token pair not found on 2nd DEX'
     }
     const arbStatus = new ArbitrageStatus()
     console.log(`${firstToken}-${secondToken}:${firstDex}-${secondDex} Bot started!`)
